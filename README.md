@@ -1,4 +1,4 @@
 dom-markers
 ===========
 
-Gives the better website development workflow
+Gives the simple website development workflow
