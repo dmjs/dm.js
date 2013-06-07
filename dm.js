@@ -65,11 +65,11 @@ DMModule.prototype = {
     return this;
   },
   /**
-   *
+   * @param {Array} args
    * @param {String} type
    * @returns {*}
    */
-  execute  : function(type){
+  execute  : function(args, type){
     var states = DMModule.STATES,
       types = DMModule.TYPES,
       obj,
@@ -100,18 +100,18 @@ DMModule.prototype = {
         obj = this._before[this.index];
         if (obj && typeof obj.callback === 'function') {
           this.context = obj.context;
-          result = obj.callback.apply(this);
+          result = obj.callback.apply(this, args);
         }
         else {
           this.state = states.BODY;
           this.index = 0;
-          this.continue();
+          this.continue(args);
         }
         break;
       case states.BODY:
         if (typeof this.body === 'function') {
           this.context = this.bodyContext;
-          this.body.apply(this);
+          this.body.apply(this, args);
           this.state = states.AFTER;
           this.index = -1;
           result = true;
@@ -121,12 +121,12 @@ DMModule.prototype = {
         obj = this._after[this.index];
         if (obj && typeof obj.callback === 'function') {
           this.context = obj.context;
-          result = obj.callback.apply(this);
+          result = obj.callback.apply(this, args);
         }
         else {
           this.state = states.FINISHED;
           this.index = 0;
-          this.continue();
+          this.continue(args);
         }
         break;
       case states.FINISHED:
@@ -136,23 +136,23 @@ DMModule.prototype = {
 
     switch(result) {
       case true:
-        this.continue();
+        this.continue(args);
         break;
       case false:
-        this.stop();
+        this.stop(args);
         break;
     }
 
     return this;
   },
-  continue : function(){
+  continue : function(args){
     this.index++;
-    this.execute(DMModule.TYPES.CONTINUE);
+    this.execute(args, DMModule.TYPES.CONTINUE);
   },
-  stop     : function(){
+  stop     : function(args){
     this.index = 0;
     this.state = DMModule.STATES.FINISHED;
-    this.execute(DMModule.TYPES.STOP);
+    this.execute(args, DMModule.TYPES.STOP);
   }
 };
 
@@ -171,6 +171,54 @@ DMUtils = {
         callback.call(context, obj[i], i);
       }
     }
+  },
+  map : function(arr, callback, context) {
+    return arr.map(callback, context);
+  },
+  /**
+   * @param {String} selector
+   * @param {HTMLElement|HTMLDocument|?} ctx
+   * @returns {NodeList}
+   */
+  all : function(selector, ctx) {
+    if (!(ctx instanceof HTMLElement || ctx instanceof HTMLDocument)) {
+      ctx = document;
+    }
+
+    return ctx.querySelectorAll(selector);
+  },
+  trim : function(str) {
+    return str.trim();
+  },
+  /**
+   *
+   * @param {HTMLElement} node
+   * @return {Array.<{name:String,args:Array}>}
+   */
+  getModules : function(node) {
+    return DMUtils.map(node.getAttribute('data-marker').match(/([a-z\-]+(\[[^[]+\])?)/ig), function(str) {
+      var parts = str.match(/[^\[\]]+/ig),
+        name, args;
+
+      name = parts.shift();
+
+      parts.unshift(node);
+
+      args = parts[1] ? DMUtils.map(parts[1].split(','), DMUtils.trim) : [];
+
+      args.unshift(node);
+
+      return {
+        name : name,
+        args : args
+      };
+    });
+  },
+  filterModules : function(modules) {
+    return modules.filter(function() {
+      //provide initialized save mechanism
+      return true;
+    });
   }
 };
 
@@ -235,8 +283,23 @@ DM = (function(options) {
       return this;
     },
     go : function() {
-      DMUtils.each(_modules, function(module) {
-        module.execute();
+      //find nodes
+      var nodes = DMUtils.all('[data-marker]');
+
+      DMUtils.each(Array.prototype.slice.call(nodes), function(node) {
+        var modules = DMUtils.getModules(node);
+
+        modules = DMUtils.filterModules(modules);
+
+        DMUtils.each(modules, function(data) {
+          console.log(data);
+
+          var module = getModule(data.name);
+
+          if (module) {
+            module.execute(data.args);
+          }
+        });
       });
 
       return this;

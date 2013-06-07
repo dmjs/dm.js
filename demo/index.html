@@ -6,6 +6,7 @@
 </head>
 <body>
 <h1 data-marker="test[a,b]">Lorem ipsum</h1>
+<h1 data-marker="test[c,d]">Dolor sit amet</h1>
 <script src="../components/yui3-seed/yui-min.js"></script>
 <script src="../dm.js"></script>
 <script>
@@ -42,10 +43,11 @@
     console.group('test module before');
     console.log(arguments, this);
     console.groupEnd('test module before');
-    var self = this;
+    var self = this,
+        args = arguments;
 
     setTimeout(function() {
-      self.continue();
+      self.continue(args);
     }, 100);
   });
 
