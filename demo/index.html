@@ -5,7 +5,51 @@
   <title></title>
 </head>
 <body>
+<h1 data-marker="test[a,b]">Lorem ipsum</h1>
 <script src="../components/yui3-seed/yui-min.js"></script>
 <script src="../dm.js"></script>
+<script>
+  DM.add('test', function(){
+    console.group('test module body');
+    console.log(arguments, this);
+    console.groupEnd('test module body');
+  }, {
+    a: 1
+  });
+
+  DM.after('test', function() {
+    console.group('test module after 0');
+    console.log(arguments, this);
+    console.groupEnd('test module after 0');
+    return true;
+  }, {b:1})
+
+  DM.after('test', function() {
+    console.group('test module after -1');
+    console.log(arguments, this);
+    console.groupEnd('test module after -1');
+    return true;
+  }, {c:1}, -1)
+
+  DM.after('test', function() {
+    console.group('test module after 100');
+    console.log(arguments, this);
+    console.groupEnd('test module after 100');
+    return true;
+  }, {c:1}, 100)
+
+  DM.before('before', function() {
+    console.group('test module before');
+    console.log(arguments, this);
+    console.groupEnd('test module before');
+    var self = this;
+
+    setTimeout(function() {
+      self.continue();
+    }, 100);
+  });
+
+  DM.go();
+</script>
 </body>
 </html>
