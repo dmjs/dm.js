@@ -212,10 +212,9 @@ DMExec.prototype = {
       case states.BODY:
         if (typeof module.body === 'function') {
           this.context = module.context;
-          module.body.apply(this, this.args);
+          result = module.body.apply(this, this.args);
           this.state = states.AFTER;
           this.index = -1;
-          result = true;
         }
         break;
       case states.FINISHED:
@@ -225,13 +224,13 @@ DMExec.prototype = {
         break;
     }
 
-    switch (result) {
-      case true:
-        this.continue();
-        break;
-      case false:
+    if (this.state !== states.INITIAL) {
+      if (result === false) {
         this.stop();
-        break;
+      }
+      else if (result) {
+        this.continue();
+      }
     }
 
     return this;

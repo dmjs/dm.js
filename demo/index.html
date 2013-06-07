@@ -14,15 +14,15 @@
 <script>
 
   DM.before('size', function(size) {
-    //console.log(this);
     this.node.style.fontSize = size + 'px';
-  });
+  }, 123);
 
   DM.before('size', function(size) {
-    //console.log(this);
-    this.node.style.fontSize = size + 'px';
+    this.node.style.fontSize = '11px';
 
-    this.node
+    setTimeout(function(ctx) {
+      ctx.continue();
+    }, 1000, this);
   }, {superContext : '123'}, -100);
 
   DM.go();
