@@ -1,160 +1,4 @@
-var DM;
-
-function DMModule(callback, context) {
-  this.body = callback;
-  this.bodyContext = context;
-}
-
-DMModule.STATES = {
-  INITIAL  : 0,
-  BEFORE   : 1,
-  BODY     : 2,
-  AFTER    : 3,
-  FINISHED : 4
-};
-
-DMModule.TYPES = {
-  CONTINUE : 'continue',
-  STOP     : 'stop'
-};
-
-DMModule.prototype = {
-  constructor : DMModule,
-  _before     : [],
-  _after      : [],
-  context     : null,
-  body        : null,
-  bodyContext : null,
-  state       : 0,
-  index       : 0,
-  sorted      : false,
-  _sort       : function(arr) {
-    arr.sort(function(a,b) {
-      var result;
-
-      if (a.weight === b.weight) {
-        result = 0;
-      }
-      else {
-        result = a.weight > b.weight ? 1 : -1;
-      }
-
-      return result;
-    });
-  },
-  before   : function(callback, context, weight){
-    this.sorted = false;
-
-    this._before.push({
-      callback : callback,
-      context  : context,
-      weight   : weight || 0
-    });
-
-    return this;
-  },
-  after    : function(callback, context, weight){
-    this.sorted = false;
-
-    this._after.push({
-      callback : callback,
-      context  : context,
-      weight   : weight || 0
-    });
-
-    return this;
-  },
-  /**
-   * @param {Array} args
-   * @param {String} type
-   * @returns {*}
-   */
-  execute  : function(args, type){
-    var states = DMModule.STATES,
-      types = DMModule.TYPES,
-      obj,
-      result;
-
-    if (!this.sorted) {
-      this._sort(this._after);
-      this._sort(this._before);
-      this.sorted = true;
-    }
-
-    switch (type) {
-      case types.CONTINUE:
-
-        break;
-    }
-
-    if (type === types.CONTINUE && this.state === states.INITIAL) {
-      //do nothing when continue executed in INITIAL state
-      return;
-    }
-
-    //noinspection FallthroughInSwitchStatementJS
-    switch(this.state) {
-      case states.INITIAL:
-        this.state = states.BEFORE;
-      case states.BEFORE:
-        obj = this._before[this.index];
-        if (obj && typeof obj.callback === 'function') {
-          this.context = obj.context;
-          result = obj.callback.apply(this, args);
-        }
-        else {
-          this.state = states.BODY;
-          this.index = 0;
-          this.continue(args);
-        }
-        break;
-      case states.BODY:
-        if (typeof this.body === 'function') {
-          this.context = this.bodyContext;
-          this.body.apply(this, args);
-          this.state = states.AFTER;
-          this.index = -1;
-          result = true;
-        }
-        break;
-      case states.AFTER:
-        obj = this._after[this.index];
-        if (obj && typeof obj.callback === 'function') {
-          this.context = obj.context;
-          result = obj.callback.apply(this, args);
-        }
-        else {
-          this.state = states.FINISHED;
-          this.index = 0;
-          this.continue(args);
-        }
-        break;
-      case states.FINISHED:
-        this.state = DMModule.STATES.INITIAL;
-        break;
-    }
-
-    switch(result) {
-      case true:
-        this.continue(args);
-        break;
-      case false:
-        this.stop(args);
-        break;
-    }
-
-    return this;
-  },
-  continue : function(args){
-    this.index++;
-    this.execute(args, DMModule.TYPES.CONTINUE);
-  },
-  stop     : function(args){
-    this.index = 0;
-    this.state = DMModule.STATES.FINISHED;
-    this.execute(args, DMModule.TYPES.STOP);
-  }
-};
+var DM, DMUtils;
 
 DMUtils = {
   /**
@@ -168,7 +12,7 @@ DMUtils = {
 
     for(i in obj) {
       if (obj.hasOwnProperty(i)) {
-        callback.call(context, obj[i], i);
+        callback.call(context, obj[i], i, obj);
       }
     }
   },
@@ -198,15 +42,27 @@ DMUtils = {
   getModules : function(node) {
     return DMUtils.map(node.getAttribute('data-marker').match(/([a-z\-]+(\[[^[]+\])?)/ig), function(str) {
       var parts = str.match(/[^\[\]]+/ig),
-        name, args;
+        name,
+        args;
 
-      name = parts.shift();
+      name  = parts.shift();
+      args = parts[0] ? DMUtils.map(parts[0].split(','), DMUtils.trim) : [];
 
-      parts.unshift(node);
-
-      args = parts[1] ? DMUtils.map(parts[1].split(','), DMUtils.trim) : [];
-
-      args.unshift(node);
+      //convert arguments to native types
+      DMUtils.each(args, function(value, key, data) {
+        if (value === 'false') {
+          data[key] = !1;
+        }
+        else if (value === 'true') {
+          data[key] = !0;
+        }
+        else if (value == parseFloat(value)) {
+          data[key] = parseFloat(value);
+        }
+        else if (value === 'null') {
+          data[key] = null;
+        }
+      });
 
       return {
         name : name,
@@ -222,6 +78,165 @@ DMUtils = {
   }
 };
 
+function DMModule(callback, context) {
+  this.body = callback;
+  this.context = context;
+}
+
+DMModule.prototype = {
+  constructor : DMModule,
+  _before     : [],
+  _after      : [],
+  body        : null,
+  context     : null,
+  ready       : false,
+  _sort       : function(arr){
+    arr.sort(function(a,b) {
+      var result;
+
+      if (a.weight === b.weight) {
+        result = 0;
+      }
+      else {
+        result = a.weight > b.weight ? 1 : -1;
+      }
+
+      return result;
+    });
+    return this;
+  },
+  prepare : function() {
+    this._sort(this._after)._sort(this._before);
+    this.ready = true;
+    return this;
+  },
+  before   : function(callback, context, weight){
+    this.ready = false;
+
+    this._before.push({
+      callback : callback,
+      context  : context,
+      weight   : weight || 0
+    });
+
+    return this;
+  },
+  after    : function(callback, context, weight){
+    this.ready = false;
+
+    this._after.push({
+      callback : callback,
+      context  : context,
+      weight   : weight || 0
+    });
+
+    return this;
+  }
+};
+
+function DMExec(module, node, args) {
+  this.module = module;
+  this.node = node;
+  this.args = args;
+}
+
+DMExec.STATES = {
+  INITIAL  : 0,
+  BEFORE   : 1,
+  BODY     : 2,
+  AFTER    : 3,
+  FINISHED : 4
+};
+
+DMExec.TYPES = {
+  CONTINUE : 'continue',
+  STOP     : 'stop'
+};
+
+DMExec.prototype = {
+  constructor : DMExec,
+  state       : 0,
+  index       : 0,
+  module      : null,
+  node        : null,
+  args        : null,
+  context     : null,
+  continue : function(){
+    this.index++;
+    this.execute(DMExec.TYPES.CONTINUE);
+  },
+  stop     : function(){
+    this.index = 0;
+    this.state = DMExec.STATES.FINISHED;
+    this.execute(DMExec.TYPES.STOP);
+  },
+  /**
+   *
+   * @param {String?} type
+   * @returns {*}
+   */
+  execute : function(type) {
+    var states = DMExec.STATES,
+      types = DMExec.TYPES,
+      module = this.module,
+      obj,
+      nextState,
+      result;
+
+    if (!(type === types.CONTINUE && this.state === states.INITIAL)) {
+      if (!module.ready) {
+        module.prepare();
+      }
+    }
+
+    if (this.state === states.INITIAL) {
+      this.state = states.BEFORE;
+    }
+
+    //noinspection FallthroughInSwitchStatementJS
+    switch (this.state) {
+      case states.BEFORE:
+      case states.AFTER:
+        obj = module[this.state === states.BEFORE ? '_before' : '_after'][this.index];
+
+        if (obj && typeof obj.callback === 'function') {
+          this.context = obj.context;
+          result = obj.callback.apply(this, this.args);
+        }
+        else {
+          this.state = this.state === states.BEFORE ? states.BODY : states.FINISHED;
+          this.index = -1;
+          this.continue();
+        }
+        break;
+      case states.BODY:
+        if (typeof module.body === 'function') {
+          this.context = module.context;
+          module.body.apply(this, this.args);
+          this.state = states.AFTER;
+          this.index = -1;
+          result = true;
+        }
+        break;
+      case states.FINISHED:
+        this.state = states.INITIAL;
+        this.index = 0;
+        this.context = null;
+        break;
+    }
+
+    switch (result) {
+      case true:
+        this.continue();
+        break;
+      case false:
+        this.stop();
+        break;
+    }
+
+    return this;
+  }
+};
 
 DM = (function(options) {
   var _modules,
@@ -235,7 +250,7 @@ DM = (function(options) {
    * @returns {DMModule}
    */
   function createModule(name, callback, context) {
-    return new DMModule(callback, context);
+    return _modules[name] = new DMModule(callback, context);
   }
 
   /**
@@ -253,10 +268,16 @@ DM = (function(options) {
 
   return {
     add : function(name, callback, context) {
-      if (getModule(name)) {
-        throw new Error('Module `' + name + '` is already defined');
+      var module = getModule(name);
+      if (module) {
+        if (typeof module.body === 'function') {
+          throw new Error('Module(' + name + ') body callback is already defined');
+        }
+        else {
+          module.body = callback;
+        }
       }
-      _modules[name] = createModule(name, callback, context);
+      createModule(name, callback, context);
 
       return this;
     },
@@ -292,12 +313,10 @@ DM = (function(options) {
         modules = DMUtils.filterModules(modules);
 
         DMUtils.each(modules, function(data) {
-          console.log(data);
-
           var module = getModule(data.name);
 
           if (module) {
-            module.execute(data.args);
+            (new DMExec(module, node, data.args)).execute();
           }
         });
       });
