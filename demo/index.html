@@ -3,25 +3,54 @@
 <head>
   <meta charset="UTF-8">
   <title></title>
+  <style>
+    h3 {
+      transition: all 0.3s ease-in;
+      text-align : center;
+    }
+  </style>
 </head>
 <body>
 <h1>hello</h1>
-<h2 data-marker>cruel</h2>
-<h3 data-marker="widget[300,400]">world</h3>
-
-<script src="../components/jquery/jquery.min.js"></script>
+<h2>cruel</h2>
+<h3 data-marker="widget[200,200, red, white]">world</h3>
+<!--<script src="../components/jquery/jquery.min.js"></script>-->
+<!--<script src="../components/yui3-seed/yui.js"></script>-->
 <script src="../dm.js"></script>
 <script>
-  DM.before('widget', function() {
-    //console.log(this);
-    this.node.style.fontSize = '44px';
-    return true;
-  }, {b:'B value'});
+  DM.before('widget', function(w, h, bg, c) {
+    var self = this,
+        style = this.node.style;
 
-  DM.add('widget', function() {
-    //console.log(this);
-    this.node.style.color = 'blue';
-  }, {c:'C value'});
+    style.width = w/2 + 'px';
+    style.height = h/2 + 'px';
+    style.backgroundColor = 'black';
+    style.color = 'white';
+
+    setTimeout(function() {
+      self.next();
+    }, 500);
+  });
+
+  DM.before('after', function() {
+    this.node.style.opacity = 0.5;
+
+    return true;
+  });
+
+  DM.add('widget', function(w, h, bg, c) {
+    var self = this,
+      style = this.node.style;
+
+    style.width = w + 'px';
+    style.height = h + 'px';
+    style.backgroundColor = bg;
+    style.color = c;
+
+    setTimeout(function() {
+      self.next();
+    }, 500);
+  });
 
   DM.go();
 </script>
