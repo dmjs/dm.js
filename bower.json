@@ -1,7 +1,7 @@
 {
   "name": "dm",
   "description": "DOM markers",
-  "version": "0.1",
+  "version": "0.1.0",
   "main": "dm.js",
   "ignore": [
     "**/.*",
