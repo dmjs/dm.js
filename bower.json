@@ -11,7 +11,7 @@
   ],
   "dependencies": {
     "yui3-seed": "~3.10.2",
-    "jquery": "~1.9",
+    "jquery": "~1",
     "bootstrap": "~2.3.2"
   }
 }
