@@ -20,6 +20,7 @@ DMUtils = {
     return arr.map(callback, context);
   },
   /**
+   * @param {Function} callback
    * @param {String} selector
    * @param {HTMLElement|HTMLDocument|?} ctx
    * @returns {NodeList}
@@ -70,10 +71,19 @@ DMUtils = {
       };
     });
   },
+  filter : function(arr, callback) {
+    return arr.filter(callback);
+  },
   filterModules : function(node, modules) {
-    return modules.filter(function() {
-      //TODO : provide initialized save mechanism
-      return true;
+    return DMUtils.filter(modules, function(module) {
+      var _data = node._dm || (node._dm = {}),
+        result = false;
+
+      if (!_data[module.name]) {
+        _data[module.name] = true;
+        result = true;
+      }
+      return result;
     });
   }
 };
@@ -239,36 +249,65 @@ DMExec.prototype = {
 
 DM = (function(options) {
   var _modules,
+    _engine,
     UNDEFINED = 'undefined';
 
-  var eg;
+  function initEngine(callback) {
+    if (!_engine) {
+      if (options.engines.y) {
+        //_engine = options.engines.y;
+        options.engines.y().use('node-base', 'array-extras', function(Y) {
+          DMUtils.all = function(selector, ctx){
+            //todo - add context support
+            return Y.all(selector).getDOMNodes();
+          };
 
-  if (options.engines.j) {
-    //todo - add these functions only if the native are not supported
-    //jQuery
-    eg = options.engines.j;
+          DMUtils.map = function(arr, callback, context){
+            return Y.Array.map(arr, callback, context);
+          };
 
-    DMUtils.all = function(selector, ctx) {
-      return Array.prototype.slice.call(eg(selector, ctx));
-    };
+          DMUtils.filter = function(arr, callback){
+            return Y.Array.filter(arr, callback);
+          };
 
-    DMUtils.map = function(arr, callback, context) {
-      return eg.map(arr, callback);
-    };
+          DMUtils.trim = function(str){
+            return Y.Lang.trim(str);
+          };
 
-    DMUtils.filterModules = function(node, modules) {
-      return eg.grep(modules, function() {
-        //todo - provide initialized save mechanism
-        return true;
-      });
-    };
+          _engine = Y;
 
-    DMUtils.trim = function(str) {
-      return eg.trim(str);
-    };
+          callback();
+        });
+      } else if (options.engines.j) {
+        _engine = options.engines.j;
+
+        DMUtils.all = function(selector, ctx){
+          return Array.prototype.slice.call(_engine(selector, ctx));
+        };
+
+        DMUtils.map = function(arr, callback, context){
+          return _engine.map(arr, callback);
+        };
+
+        DMUtils.filter = function(arr, callback){
+          return _engine.grep(arr, callback);
+        };
+
+        DMUtils.trim = function(str){
+          return _engine.trim(str);
+        };
+
+        callback();
+      }
+      else {
+        _engine = true;
+        callback();
+      }
+    }
+    else {
+      callback();
+    }
   }
-
-  //todo - add YUI support
 
   /**
    * Create new {DMModule} instance
@@ -332,23 +371,23 @@ DM = (function(options) {
       return this;
     },
     go : function() {
-      //find nodes
-      var nodes = DMUtils.all('[data-marker]');
+      initEngine(function() {
+        var nodes = DMUtils.all('[data-marker]', options.env.document);
 
-      DMUtils.each(Array.prototype.slice.call(nodes), function(node) {
-        var modules = DMUtils.getModules(node);
+        DMUtils.each(Array.prototype.slice.call(nodes), function(node) {
+          var modules = DMUtils.getModules(node);
 
-        modules = DMUtils.filterModules(node, modules);
+          modules = DMUtils.filterModules(node, modules);
 
-        DMUtils.each(modules, function(data) {
-          var module = getModule(data.name);
+          DMUtils.each(modules, function(data) {
+            var module = getModule(data.name);
 
-          if (module) {
-            (new DMExec(module, node, data.args)).execute();
-          }
+            if (module) {
+              (new DMExec(module, node, data.args)).execute();
+            }
+          });
         });
       });
-
       return this;
     }
   };
