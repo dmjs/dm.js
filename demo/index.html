@@ -5,25 +5,23 @@
   <title></title>
 </head>
 <body>
-<h1 data-marker="color[red],size[60]">hello</h1>
-<h2 data-marker="size[100],color[blue]">cruel</h2>
-<h3 data-marker="color[green],size[30]">world</h3>
+<h1>hello</h1>
+<h2 data-marker>cruel</h2>
+<h3 data-marker="widget[300,400]">world</h3>
 
-<script src="../components/yui3-seed/yui-min.js"></script>
+<script src="../components/jquery/jquery.min.js"></script>
 <script src="../dm.js"></script>
 <script>
+  DM.before('widget', function() {
+    //console.log(this);
+    this.node.style.fontSize = '44px';
+    return true;
+  }, {b:'B value'});
 
-  DM.before('size', function(size) {
-    this.node.style.fontSize = size + 'px';
-  }, 123);
-
-  DM.before('size', function(size) {
-    this.node.style.fontSize = '11px';
-
-    setTimeout(function(ctx) {
-      ctx.continue();
-    }, 1000, this);
-  }, {superContext : '123'}, -100);
+  DM.add('widget', function() {
+    //console.log(this);
+    this.node.style.color = 'blue';
+  }, {c:'C value'});
 
   DM.go();
 </script>

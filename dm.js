@@ -40,7 +40,7 @@ DMUtils = {
    * @return {Array.<{name:String,args:Array}>}
    */
   getModules : function(node) {
-    return DMUtils.map(node.getAttribute('data-marker').match(/([a-z\-]+(\[[^[]+\])?)/ig), function(str) {
+    return DMUtils.map(node.getAttribute('data-marker').match(/([a-z\-]+(\[[^[]+\])?)/ig) || [], function(str) {
       var parts = str.match(/[^\[\]]+/ig),
         name,
         args;
@@ -70,9 +70,9 @@ DMUtils = {
       };
     });
   },
-  filterModules : function(modules) {
+  filterModules : function(node, modules) {
     return modules.filter(function() {
-      //provide initialized save mechanism
+      //TODO : provide initialized save mechanism
       return true;
     });
   }
@@ -149,8 +149,8 @@ DMExec.STATES = {
 };
 
 DMExec.TYPES = {
-  CONTINUE : 'continue',
-  STOP     : 'stop'
+  NEXT : 'next',
+  STOP : 'stop'
 };
 
 DMExec.prototype = {
@@ -161,11 +161,11 @@ DMExec.prototype = {
   node        : null,
   args        : null,
   context     : null,
-  continue : function(){
+  next : function(){
     this.index++;
-    this.execute(DMExec.TYPES.CONTINUE);
+    this.execute(DMExec.TYPES.NEXT);
   },
-  stop     : function(){
+  stop : function(){
     this.index = 0;
     this.state = DMExec.STATES.FINISHED;
     this.execute(DMExec.TYPES.STOP);
@@ -183,7 +183,7 @@ DMExec.prototype = {
       nextState,
       result;
 
-    if (!(type === types.CONTINUE && this.state === states.INITIAL)) {
+    if (!(type === types.NEXT && this.state === states.INITIAL)) {
       if (!module.ready) {
         module.prepare();
       }
@@ -206,7 +206,7 @@ DMExec.prototype = {
         else {
           this.state = this.state === states.BEFORE ? states.BODY : states.FINISHED;
           this.index = -1;
-          this.continue();
+          this.next();
         }
         break;
       case states.BODY:
@@ -229,7 +229,7 @@ DMExec.prototype = {
         this.stop();
       }
       else if (result) {
-        this.continue();
+        this.next();
       }
     }
 
@@ -240,6 +240,35 @@ DMExec.prototype = {
 DM = (function(options) {
   var _modules,
     UNDEFINED = 'undefined';
+
+  var eg;
+
+  if (options.engines.j) {
+    //todo - add these functions only if the native are not supported
+    //jQuery
+    eg = options.engines.j;
+
+    DMUtils.all = function(selector, ctx) {
+      return Array.prototype.slice.call(eg(selector, ctx));
+    };
+
+    DMUtils.map = function(arr, callback, context) {
+      return eg.map(arr, callback);
+    };
+
+    DMUtils.filterModules = function(node, modules) {
+      return eg.grep(modules, function() {
+        //todo - provide initialized save mechanism
+        return true;
+      });
+    };
+
+    DMUtils.trim = function(str) {
+      return eg.trim(str);
+    };
+  }
+
+  //todo - add YUI support
 
   /**
    * Create new {DMModule} instance
@@ -309,7 +338,7 @@ DM = (function(options) {
       DMUtils.each(Array.prototype.slice.call(nodes), function(node) {
         var modules = DMUtils.getModules(node);
 
-        modules = DMUtils.filterModules(modules);
+        modules = DMUtils.filterModules(node, modules);
 
         DMUtils.each(modules, function(data) {
           var module = getModule(data.name);
