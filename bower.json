@@ -3,6 +3,12 @@
   "description": "DOM markers",
   "version": "0.1",
   "main": "dm.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components",
+    "demo",
+  ],
   "dependencies": {
     "yui3-seed": "~3.10.2",
     "jquery": "~1.9",
