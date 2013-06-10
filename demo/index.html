@@ -32,7 +32,7 @@
     }, 500);
   });
 
-  DM.before('after', function() {
+  DM.after('widget', function() {
     this.node.style.opacity = 0.5;
 
     return true;
