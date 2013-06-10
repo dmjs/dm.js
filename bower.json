@@ -1,0 +1,8 @@
+{
+  "name": "dm.js",
+  "version": "0.0.0",
+  "dependencies": {
+    "yui3-seed": "~3.10.2",
+    "jquery": "~1.9"
+  }
+}

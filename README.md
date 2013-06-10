@@ -1,4 +1,3 @@
-dom-markers
-===========
+#DOM markers
 
-Gives the simple website development workflow
+Gives the simple website development workflow.
