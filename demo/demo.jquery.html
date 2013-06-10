@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <title>DM example</title>
+  <script src="../components/jquery/jquery.min.js"></script>
+  <script src="../dm.js"></script>
+  <link rel="stylesheet" href="../components/bootstrap/docs/assets/css/bootstrap.css" />
+  <style type="text/css">
+    .widget {
+      margin : 10px 0;
+      min-height: 90px;
+      transition: opacity 0.5s ease;
+    }
+    .widget.loading {
+      opacity: 0.3;
+      text-align : center;
+      line-height : 70px;
+      font-size : 40px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+    <div class="well widget" data-marker="get[_data.html]">...</div>
+</div>
+<script>
+  (function($) {
+    /**
+     * Set node to loading state
+     */
+    DM.before('get', function() {
+      return $(this.node).addClass('loading');
+    });
+
+    /**
+     * Remove loading state from the node
+     */
+    DM.after('get', function() {
+      return $(this.node).removeClass('loading');
+    });
+
+    /**
+     * Basic content loading code
+     */
+    DM.add('get', function(url) {
+      var cb = $.proxy(function(html) {
+        $(this.node).html(html);
+        this.next();
+      }, this);
+
+      setTimeout(function() {
+        $.get(url, cb);
+      }, 600);
+    });
+  })(jQuery);
+
+  DM.go();
+</script>
+</body>
+</html>
