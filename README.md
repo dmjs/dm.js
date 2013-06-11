@@ -50,10 +50,11 @@ Define the module. It have 3 arguments:
 * {Function} module callback - each module can have only on main callback
 * {Any} optional context; default - `undefined`
 
-
-      DM.add('moduleName', function(/*will take arguments from the DOM element*/) {
+<pre>
+    DM.add('moduleName', function(/*will take arguments from the DOM element*/) {
         /*Your code goes here*/
-      }, {module:'context'});
+    }, {module:'context'});
+</pre>
 
 ###before & after
 
@@ -66,10 +67,13 @@ Accept 4 arguments:
 * {Any} optional context; default - `undefined`
 * {Number} optional weight; default - `0`; Lower values have a higher priority
 
-
-      DM.before('moduleName', function(/*will take arguments from the DOM element*/) {
+<pre>
+    DM.before('moduleName', function(/*will take arguments from the DOM element*/) {
         /*Your code goes here*/
-      }, {module:'context'});
+    }, {module:'context'});
+</pre>
+
+        
 
 ###go
 
