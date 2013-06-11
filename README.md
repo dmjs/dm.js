@@ -84,10 +84,14 @@ Example:
 ##Workflow
 
 * Callbacks execution starts with `DM.go()`
-* DM finds all the DOM Elements which have `data-markers` attribute
-* Parse the attribute values. It might have
+* DM finds all the DOM Elements which have `data-marker` attribute
+* Parse the attribute values. It could have
     * the list of modules separated by commas : `data-marker="moduleOne, moduleTwo"`
     * the arguments for a callbacks: `data-marker="moduleName[value1,value2]"`
+* Parse arguments. The following rules will be applied:
+    * 'true', 'false' strings will be converted into boolean values
+    * float/integer values will be converted into correspond float/integer values
+    * 'null' string will be converted into native null value
 * If the listed modules is defined with `add`/`before`/`after`, then a new instance of execution(`DMExec`) object
   will be created for each module & DOM element;
 * This (DMExec) instance manage callbacks execution order:
