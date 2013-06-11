@@ -1,0 +1,14 @@
+{
+  "name": "yui3-seed",
+  "description": "YUI3 library seed file",
+  "version": "3.10.3",
+  "main": "yui-min.js",
+  "gitHead": "4130f74f15483ef9656a0f4c3cb6bd6ab4fb594e",
+  "readme": "# yui3-seed\n\n[YUI 3](https://github.com/yui/yui3) seed files to use it with [bower](http://bower.io/).\n\n## Installation instruction:\n\n`bower install yui3-seed`\n\n[Read more on how to use YUI3 seed files](http://yuilibrary.com/yui/docs/yui/#getting-started)\n\n## Example:\n\n```html\n<script src=\"[bower_components_directory]/yui3-seed/yui-min.js\"></script>\n<script>\n  YUI({\n    modules   : {\n      'your-optional-custom-module' : {\n        fullpath : 'path/to/module.js'\n      }\n    }\n  }).use('your-optional-custom-module', function(Y){\n        // Your code goes here\n      });\n</script>\n```\n",
+  "readmeFilename": "README.md",
+  "_id": "yui3-seed@3.10.3",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jslayer/yui3-seed.git"
+  }
+}
