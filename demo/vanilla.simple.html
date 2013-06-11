@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+<body>
+<h1 data-marker="color[green],size[50px]">Hello cruel world</h1>
+<script src="../dm.js"></script>
+<script>
+  DM.add('color', function(value) {
+    this.node.style.color = value;
+  });
+
+  DM.add('size', function(value) {
+    this.node.style.fontSize = value;
+  });
+
+  DM.go();
+</script>
+</body>
+</html>
