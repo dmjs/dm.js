@@ -1,0 +1,24 @@
+{
+  "name": "jquery-combobox",
+  "version": "1.1.0",
+  "main": "combobox.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components",
+    "config.rb",
+    "post.php"
+  ],
+  "dependencies": {
+    "jquery": "~1.8.0"
+  },
+  "gitHead": "81cb99d0a17fb4831270b80756b19c9f7a7a0943",
+  "readme": "#jQuery Combobox plugin\n\nYet another combobox plugin. Were developed for my own purposes and successfully used in many projects.\n\n##Features\n\n* works with jQuery 1.8+\n\n##Usage\n\nBasic usage:\n\n    $('select').combobox([{options}], [{classes}]);\n\n##Parameters\n\n###Options\n\n####`width` and `height`\n\n`int` Determines the `width`/`height` of the element. Defaults is `false` - `width`/`height` will depend on the `width`/`height` of the source element. \n\n####`btnWidth`\n\n`int` Determines the element's button width (in px). Defaults is 15.\n\n####`showSpeed` and `hideSpeed`\n\n`mixed` Speed of the show/hide animation effect. Defaults is `fast`.\n\n####`hideSelected`\n\n`bool` If is `true` the selected element will he hidden from the dropdown list. By default is `false`.\n\n####`listMaxHeight`\n\n`int` Maximum height of the dropdown list. Vertical scrollbar appears when list height is greater than this value. Defaults is `false` - no limit.\n\n####`hoverEnabled`\n\n`bool` Enables hover feature. For performance reasons by default is `false`\n\n####`theme`\n\n`string` Set the \"theme\" prefix - it will be used in CSS classes for generated elements. Defaults is `combo`\n\n####`filter`\n\n`function` You can setup your own content filter; This callback accept name of the filter and the initial value;\nThan you should return this or modified value;\n\nSupported filters:\n* `selected` - The text of the selected box.\n\n###Classes\n\nList of default element's CSS classes suffixes and their default values.\n\n* `wrapper` - `wrapper`\n* `focus` - `focus`\n* `disabled` - `disabled`\n* `multiple` - `multiple`\n* `button` - `button`\n* `group` - `group`\n* `groupLabel` - `group-label`\n* `list` - `list`\n* `selected` - `selected`\n* `itemHover` - `item-hover`\n* `itemActive` - `item-active` \n* `wrapHover` - `wrapper-hover`\n* `wrapActive` - `wrapper-active`\n* `listLong` - `list-long`\n\nThe applyed css classes will be prepared from `theme_name-suffix_name`\n\n##Events\n\nYou can bind several event handlers to the source (select) element, to catch some usefull events.\n\n###`before_show` and `before_hide`\n\nCalled before show/hide dropdown.\n\n###`combo_init`\n\nCombobox init event.\n\n###`update_position`\n\nCalled just before update the position of the dropdown. This even receive offset object, so you can easily change the dropdown position.\n",
+  "readmeFilename": "README.md",
+  "_id": "jquery-combobox@1.1.0",
+  "description": "Yet another combobox plugin. Were developed for my own purposes and successfully used in many projects.",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jslayer/jquery-combobox.git"
+  }
+}
