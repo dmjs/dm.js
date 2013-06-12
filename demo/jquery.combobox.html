@@ -46,11 +46,11 @@
 
 <script>
   (function($) {
-    DM.add('combobox', function(rawOptions) {
+    DM.add('combobox', function() {
       var options = {};
 
       $.each(arguments, function(i, value) {
-        var parts = value.split(/:\s+/);
+        var parts = value.split(/:\s?/);
 
         if (parts.length === 2) {
           options[parts[0]] = parts[1];
