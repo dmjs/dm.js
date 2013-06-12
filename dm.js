@@ -47,6 +47,7 @@ DMUtils = {
         args;
 
       name  = parts.shift();
+      //todo - parse json hash
       args = parts[0] ? DMUtils.map(parts[0].split(','), DMUtils.trim) : [];
 
       //convert arguments to native types
