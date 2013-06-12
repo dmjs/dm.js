@@ -73,8 +73,6 @@ Accept 4 arguments:
     }, {module:'context'});
 </pre>
 
-        
-
 ###go
 
 Will execute all the defined "modules".
@@ -102,6 +100,13 @@ Example:
 * Also, you can control the execution process by calling `this.next()` & `this.stop()` methods
   It will allows you to proceed/stop execution after some long actions
 * Each module will be processed for each DOM element only once
+
+##DMExec object properies & method
+
+* `args` - array of the arguments
+* `context` - will have the current execution (one of before/add/after) context
+* `node` - target DOM Element
+* `state` & `index` - internal properties
 
 ##Release History
 

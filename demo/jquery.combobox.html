@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8">
+  <title>DM example</title>
+  <script src="components/jquery/jquery.min.js"></script>
+  <script src="components/jquery-combobox/combobox.js"></script>
+  <script src="../dm.js"></script>
+  <link rel="stylesheet" href="components/jquery-combobox/css/combobox.css" />
+</head>
+<body>
+
+<h2>Simple:</h2>
+
+<select data-marker="combobox">
+  <option value="1">Lorem</option>
+  <option value="2">Ipsum</option>
+  <option value="3">Dolor</option>
+</select>
+
+<h2>Disabled:</h2>
+
+<select data-marker="combobox[{a:b, {c:d}}]" disabled>
+  <option value="1">Lorem</option>
+  <option value="2">Ipsum</option>
+  <option value="3">Dolor</option>
+</select>
+
+<h2>With options:</h2>
+
+<select data-marker="combobox[btnWidth: 20, hoverEnabled: true, width: 200, forceScroll: true, listMaxHeight: 134]">
+  <option value="1">Lorem</option>
+  <option value="2">Ipsum</option>
+  <option value="3">Dolor</option>
+  <option value="4">Lorem</option>
+  <option value="5">Ipsum</option>
+  <option value="6">Dolor</option>
+  <option value="7">Lorem</option>
+  <option value="8">Ipsum</option>
+  <option value="9">Dolor</option>
+  <option value="10">Lorem</option>
+  <option value="11">Ipsum</option>
+  <option value="12">Dolor</option>
+</select>
+
+
+<script>
+  (function($) {
+    DM.add('combobox', function(rawOptions) {
+      var options = {};
+
+      $.each(arguments, function(i, value) {
+        var parts = value.split(/:\s+/);
+
+        if (parts.length === 2) {
+          options[parts[0]] = parts[1];
+        }
+      });
+
+      $(this.node).combobox(options);
+    });
+  })(jQuery);
+
+  DM.go();
+</script>
+</body>
+</html>
