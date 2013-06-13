@@ -6,7 +6,7 @@ This will allows you do not use CSS selectors to find the elements.
 
 ##Version
 
-Current version is: __*0.2.0*__
+Current version is: __*0.2.1*__
 
 ##Example
 
@@ -166,6 +166,23 @@ Accept two optional arguments:
 * `node` - target DOM Element
 * `state` & `index` - internal properties
 
+##Running tests
+
+In order to run tests makes sure that [bower][bower] is installed & you have installed dependencies (`$bower install`)
+
+###Testing in PhantomJS
+
+Use [grover][github-grover] to run tests in PhantomJS:
+
+<pre>
+$cd /path/to/library/root
+$grover tests/unit/*.html
+</pre>
+
+###Testing in *normal* browsers
+
+simply open `tests/unit/dm.html` in browser & check the output of the testing console
+
 ##Release History
 
 See the [Changelog][changelog]
@@ -182,3 +199,4 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 [changelog]:CHANGELOG.md
 [release]:https://github.com/jslayer/dm.js/zipball/master
 [bower]:http://bower.io/
+[github-grover]:https://github.com/yui/grover

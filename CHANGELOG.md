@@ -1,5 +1,8 @@
 #Changelog
 
+## 0.2.1 (Jub 13 2013)
+* changed : since now, you can execute newly created (after removing) module with the same name as of previously applied
+
 ## 0.2.0 (Jun 13 2013)
 * changed: the modules worlflow. DMExec doesn't look at the callback return value since now
 * changed : `before/after/add` now returns the uuid of the callback;

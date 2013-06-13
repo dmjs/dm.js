@@ -1,5 +1,5 @@
 /*
- * DOM Markers 0.2.0
+ * DOM Markers 0.2.1
  * Copyright 2013 Eugene Poltorakov
  * Licensed under the MIT License: http://www.opensource.org/licenses/mit-license.php
  */
@@ -80,14 +80,17 @@ DMUtils = {
   filter : function(arr, callback) {
     return arr.filter(callback);
   },
-  filterModules : function(node, modules) {
-    return DMUtils.filter(modules, function(module) {
+  filterModules : function(node, list, modules) {
+    return DMUtils.filter(list, function(module) {
       var _data = node._dm || (node._dm = {}),
+        uuid,
         result = false;
 
-      if (!_data[module.name]) {
-        _data[module.name] = true;
-        result = true;
+      //should set result to true, if module where not processed for this node
+      uuid = modules[module.name] && modules[module.name].uuid;
+
+      if (!_data[uuid]) {
+        result = _data[uuid] = true;
       }
       return result;
     });
@@ -443,7 +446,7 @@ DM = (function(options) {
         DMUtils.each(Array.prototype.slice.call(nodes), function(node) {
           var modules = DMUtils.getModules(node);
 
-          modules = DMUtils.filterModules(node, modules);
+          modules = DMUtils.filterModules(node, modules, _modules);
 
           DMUtils.each(modules, function(data) {
             var module = getModule(data.name);
@@ -457,7 +460,6 @@ DM = (function(options) {
       return this;
     },
     /**
-     *
      * @param {Number} uuid
      */
     detach : function(uuid) {
@@ -534,8 +536,8 @@ DM = (function(options) {
   };
 })({
   env     : {
-    win      : window,
-    document : document
+    win      : typeof window !== 'undefined' && window,
+    document : typeof document !== 'undefined' && document
   },
   engines : {
     j : typeof jQuery === 'function' && jQuery,
