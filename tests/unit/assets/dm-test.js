@@ -335,12 +335,83 @@ YUI.add('dm-test', function (Y) {
     }
   }));
 
-  //todo - test how newly created (after remove) module will work
-  //todo - check that module executed only once
+  Y.Test.Runner.add(new Y.Test.Case({
+    name: 'DOM Markers : Check that module executed only once by node',
+
+    setUp : function() {
+      Y.one('#dump').setHTML('<div id="node-a" data-marker="foo"></div>' +
+        '<div id="node-b" data-marker="bar"></div>' +
+        '<div id="node-c" data-marker="foo,bar"></div>' +
+        '<div id="node-d" data-marker="bar,foo"></div>' +
+        '<div id="node-e" data-marker="foo,foo"></div>');
+
+      this.nodes = {
+        a : Y.one('#node-a'),
+        b : Y.one('#node-b'),
+        c : Y.one('#node-c'),
+        d : Y.one('#node-d'),
+        e : Y.one('#node-e')
+      };
+
+      DM.before('foo', function() {
+        this.node.innerHTML += 'Hello ';
+      });
+
+      DM.before('foo', function() {
+        this.node.innerHTML += 'Mr. ';
+      });
+
+      DM.after('foo', function() {
+        this.node.innerHTML += '! :) ';
+      });
+
+      DM.add('foo', function() {
+        this.node.innerHTML += 'Foo';
+      });
+
+      DM.before('bar', function() {
+        this.node.innerHTML += 'Good bye ';
+      });
+
+      DM.before('bar', function() {
+        this.node.innerHTML += 'Mrs. ';
+      });
+
+      DM.after('bar', function() {
+        this.node.innerHTML += '! =) ';
+      });
+
+      DM.add('bar', function() {
+        this.node.innerHTML += 'Bar ';
+      });
+    },
+    tearDown : function() {
+      Y.one('#dump').empty();
+      DM.removeAll();
+    },
+    "should execute modules just once and get an expected results" : function() {
+      DM.go();
+      Assert.areSame('Hello Mr. Foo! :) ', this.nodes.a.getHTML(), '#node-a content should be valid');
+      Assert.areSame('Good bye Mrs. Bar ! =) ', this.nodes.b.getHTML(), '#node-b content should be valid');
+      Assert.areSame('Hello Mr. Foo! :) Good bye Mrs. Bar ! =) ', this.nodes.c.getHTML(), '#node-c content should be valid');
+      Assert.areSame('Good bye Mrs. Bar ! =) Hello Mr. Foo! :) ', this.nodes.d.getHTML(), '#node-d content should be valid');
+      Assert.areSame('Hello Mr. Foo! :) ', this.nodes.e.getHTML(), '#node-e content should be valid');
+    },
+    "show execute modules twice and get results only of second execution" : function() {
+      DM.go();
+      DM.go();
+      Assert.areSame('Hello Mr. Foo! :) ', this.nodes.a.getHTML(), '#node-a content should be valid');
+      Assert.areSame('Good bye Mrs. Bar ! =) ', this.nodes.b.getHTML(), '#node-b content should be valid');
+      Assert.areSame('Hello Mr. Foo! :) Good bye Mrs. Bar ! =) ', this.nodes.c.getHTML(), '#node-c content should be valid');
+      Assert.areSame('Good bye Mrs. Bar ! =) Hello Mr. Foo! :) ', this.nodes.d.getHTML(), '#node-d content should be valid');
+      Assert.areSame('Hello Mr. Foo! :) ', this.nodes.e.getHTML(), '#node-e content should be valid');
+    }
+  }));
+
   //todo - test wait with different parameters
   //todo - test contexts
   //todo - test stop/next
-  //todo - test removeAll/detach
+  //todo - test detach
   //todo - test before/after priorities
 
 }, '0.2.1', {requires:['dm', 'test']});
