@@ -2,57 +2,26 @@
 <html lang="en-US">
 <head>
   <meta charset="UTF-8">
-  <title></title>
-  <style>
-    h3 {
-      transition: all 0.3s ease-in;
-      text-align : center;
-    }
-  </style>
+  <title>DOM markers</title>
+  <link rel="stylesheet" href="components/bootstrap/docs/assets/css/bootstrap.css" />
 </head>
 <body>
-<h1>hello</h1>
-<h2>cruel</h2>
-<h3 data-marker="widget[200,200, red, white]">world</h3>
-<!--<script src="../components/jquery/jquery.min.js"></script>-->
-<!--<script src="../components/yui3-seed/yui.js"></script>-->
-<script src="../dm.js"></script>
-<script>
-  DM.before('widget', function(w, h, bg, c) {
-    var self = this,
-        style = this.node.style;
+<div class="container">
+  <div class="hero-unit">
+    <h1>DOM markers samples</h1>
 
-    style.width = w/2 + 'px';
-    style.height = h/2 + 'px';
-    style.backgroundColor = 'black';
-    style.color = 'white';
+    <h2>Vanilla</h2>
+    <ul>
+      <li><a href="vanilla.simple.html">Very simple example</a></li>
+    </ul>
 
-    setTimeout(function() {
-      self.next();
-    }, 500);
-  });
-
-  DM.before('after', function() {
-    this.node.style.opacity = 0.5;
-
-    return true;
-  });
-
-  DM.add('widget', function(w, h, bg, c) {
-    var self = this,
-      style = this.node.style;
-
-    style.width = w + 'px';
-    style.height = h + 'px';
-    style.backgroundColor = bg;
-    style.color = c;
-
-    setTimeout(function() {
-      self.next();
-    }, 500);
-  });
-
-  DM.go();
-</script>
+    <h2>jQuery based</h2>
+    <ul>
+      <li><a href="jquery.get.html">Loading the HTML</a></li>
+      <li><a href="jquery.combobox.html">jQuery plugin initialization</a> (<a href="https://github.com/jslayer/jquery-combobox">jslayer/jquery-combobox</a>)</a></li>
+    </ul>
+  </div>
+</div>
 </body>
 </html>
+

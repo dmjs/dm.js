@@ -5,3 +5,4 @@
 * add basic tests
 * add doc comments
 * prepare build scripts
+* add children support
