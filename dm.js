@@ -1,3 +1,9 @@
+/*
+ * DOM Markers 0.2.0
+ * Copyright 2013 Eugene Poltorakov
+ * Licensed under the MIT License: http://www.opensource.org/licenses/mit-license.php
+ */
+
 var DM, DMUtils;
 
 DMUtils = {
