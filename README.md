@@ -4,6 +4,10 @@ Gives the simple website development workflow.
 
 This will allows you do not use CSS selectors to find the elements.
 
+##Version
+
+Current version is: __*0.2.0*__
+
 ##Example
 
     <!doctype html>
@@ -81,6 +85,55 @@ Example:
 
     DM.go()
 
+###detach
+
+Remove the callback from module context
+
+Accept uuid of callback;
+
+Example:
+
+<pre>
+    var beforeUuid = DM.before('module', function(){});
+
+    DM.detach(beforeUuid);
+</pre>
+
+
+###remove
+
+Removes module from DM registry
+
+<pre>
+    DM.add('module', function(){});
+    DM.before('module', function(){});
+    DM.after('module', function(){});
+
+    DM.remove('module');
+</pre>
+
+###removeAll
+
+Removes all modules from DM registry
+
+<pre>
+    DM.add('module1', function(){});
+    DM.add('module2', function(){});
+    DM.add('module3', function(){});
+
+    DM.removeAll().go();//neither modules will be executed
+
+</pre>
+
+###wait
+
+Allow to stops module execution
+
+Accept two optional arguments:
+
+* {Number} timeout in ms; default is `5000`
+* {Boolean} stop ; default is `false`; Tells to the execution object what to do when timeout reached;
+
 ##Workflow
 
 * Callbacks execution starts with `DM.go()`
@@ -99,10 +152,11 @@ Example:
     * main (defined with `add`) module definition callback
     * `after` definitions
 * The callback have this instance as context, so it could be accessed with `this` keyword
-* Each callback should return `true` to immediately transfer control to the next callbacks
-* If any callback return `false`, this will immediately stops the execution of the current instance
-* Also, you can control the execution process by calling `this.next()` & `this.stop()` methods
-  It will allows you to proceed/stop execution after some long actions
+* You can stop the execution with `DMExec` `wait` method
+* Execution could:
+    * stops with `stop` method of `DMExec`
+    * continue with `next` method of `DMExec`
+    * stops/continue after timeout. Depends on wait second attribute;
 * Each module will be processed for each DOM element only once
 
 ##DMExec object properies & method
