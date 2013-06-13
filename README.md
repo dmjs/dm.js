@@ -55,9 +55,9 @@ Define the module. It have 3 arguments:
 * {Any} optional context; default - `undefined`
 
 <pre>
-    DM.add('moduleName', function(/*will take arguments from the DOM element*/) {
-        /*Your code goes here*/
-    }, {module:'context'});
+DM.add('moduleName', function(/*will take arguments from the DOM element*/) {
+    /*Your code goes here*/
+}, {module:'context'});
 </pre>
 
 ###before & after
@@ -72,9 +72,9 @@ Accept 4 arguments:
 * {Number} optional weight; default - `0`; Lower values have a higher priority
 
 <pre>
-    DM.before('moduleName', function(/*will take arguments from the DOM element*/) {
-        /*Your code goes here*/
-    }, {module:'context'});
+DM.before('moduleName', function(/*will take arguments from the DOM element*/) {
+    /*Your code goes here*/
+}, {module:'context'});
 </pre>
 
 ###go
@@ -94,9 +94,9 @@ Accept uuid of callback;
 Example:
 
 <pre>
-    var beforeUuid = DM.before('module', function(){});
+var beforeUuid = DM.before('module', function(){});
 
-    DM.detach(beforeUuid);
+DM.detach(beforeUuid);
 </pre>
 
 
@@ -105,11 +105,11 @@ Example:
 Removes module from DM registry
 
 <pre>
-    DM.add('module', function(){});
-    DM.before('module', function(){});
-    DM.after('module', function(){});
+DM.add('module', function(){});
+DM.before('module', function(){});
+DM.after('module', function(){});
 
-    DM.remove('module');
+DM.remove('module');
 </pre>
 
 ###removeAll
@@ -117,12 +117,11 @@ Removes module from DM registry
 Removes all modules from DM registry
 
 <pre>
-    DM.add('module1', function(){});
-    DM.add('module2', function(){});
-    DM.add('module3', function(){});
+DM.add('module1', function(){});
+DM.add('module2', function(){});
+DM.add('module3', function(){});
 
-    DM.removeAll().go();//neither modules will be executed
-
+DM.removeAll().go();//neither modules will be executed
 </pre>
 
 ###wait
