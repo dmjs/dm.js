@@ -1,6 +1,13 @@
 #Changelog
 
-## 0.2.1 (Jub 13 2013)
+## 0.2.2 (Jun 13 2012)
+* added : package.json
+* changed : [grover][github-grover] test running changed to `npm test`
+* added : new tests
+* added : Gruntfile.js file and uglify task
+* added : minified file `dm.min.js`
+
+## 0.2.1 (Jun 13 2013)
 * changed : since now, you can execute newly created (after removing) module with the same name as of previously applied
 
 ## 0.2.0 (Jun 13 2013)
@@ -17,3 +24,4 @@
 * changed: demos
 
 [readme]:README.md
+[github-grover]:https://github.com/yui/grover
