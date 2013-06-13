@@ -268,6 +268,7 @@ DMExec.prototype.execute = function(type){
       this._index = 0;
       this.context = null;
       break;
+    default:
   }
 
   if (this._state !== states.INITIAL && !this._waiting) {
@@ -276,13 +277,13 @@ DMExec.prototype.execute = function(type){
 
   return this;
 };
-DMExec.prototype.wait = function(timeout, next){
+DMExec.prototype.wait = function(timeout, stop){
   var self = this;
 
   this._waiting = true;
 
   this._timer = setTimeout(function(){
-    self[next ? 'next' : 'stop']();
+    self[stop ? 'stop' : 'next']();
   }, timeout || 5000);
 };
 
@@ -371,6 +372,13 @@ DM = (function(options) {
   }
 
   return {
+    /**
+     *
+     * @param {String} name
+     * @param {Function?} callback
+     * @param {*?} context
+     * @returns {Number}
+     */
     add : function(name, callback, context) {
       var module = getModule(name);
       if (module) {
@@ -388,6 +396,14 @@ DM = (function(options) {
 
       return module.uuid;
     },
+    /**
+     *
+     * @param {String} name
+     * @param {Function} callback
+     * @param {*?} context
+     * @param {Number?} weight
+     * @returns {Number}
+     */
     before : function(name, callback, context, weight) {
       var module = getModule(name) || createModule(name);
 
@@ -397,6 +413,14 @@ DM = (function(options) {
 
       return module.before(callback, context, weight);
     },
+    /**
+     *
+     * @param {String} name
+     * @param {Function} callback
+     * @param {*?} context
+     * @param {Number?} weight
+     * @returns {Number}
+     */
     after : function(name, callback, context, weight) {
       var module = getModule(name) || createModule(name);
 
@@ -426,16 +450,78 @@ DM = (function(options) {
       });
       return this;
     },
-    remove : function(uuid) {
+    /**
+     *
+     * @param {Number} uuid
+     */
+    detach : function(uuid) {
+      var name,
+        i,
+        obj,
+        module,
+        found = false;
 
-    },
-    clean : function(name) {
+      //check all the modules
+      //try to find uuid in module or inside the before/afters
+      for(name in _modules) {
+        if (_modules.hasOwnProperty(name)) {
+          module = _modules[name];
 
+          if (module.uuid === uuid) {
+            //remove _add c/c
+            module._add.context = null;
+            module._add.callback = null;
+            found = true;
+          }
+          else {
+            for(i in module._before) {
+              if (module._before.hasOwnProperty(i)) {
+                obj = module._before[i];
+                if (obj.uuid === uuid) {
+                  module._before.splice(i, 1);
+                  found = true;
+                  break;
+                }
+              }
+            }
+
+            if (!found) {
+              for(i in module._after) {
+                if (module._after.hasOwnProperty(i)) {
+                  obj = module._after[i];
+                  if (obj.uuid === uuid) {
+                    module._after.splice(i, 1);
+                    found = true;
+                    break;
+                  }
+                }
+              }
+            }
+          }
+
+          if (found) {
+            break;
+          }
+        }
+      }
+      return this;
     },
     /**
-     * Remove all modules;
+     * Remove module from DM
+     * @param name
+     * @returns {DM}
      */
-    cleanAll : function() {
+    remove : function(name) {
+      if (_modules[name]) {
+        delete _modules[name];
+      }
+      return this;
+    },
+    /**
+     * Remove all modules from DM registry
+     * @returns {DM}
+     */
+    removeAll : function() {
       _modules = {};
       return this;
     }
