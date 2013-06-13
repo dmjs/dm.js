@@ -166,13 +166,13 @@ Accept two optional arguments:
 * `node` - target DOM Element
 * `state` & `index` - internal properties
 
-##Tests
+##Running tests
 
-In order to run tests makes sure that [`bower`][bower] is installed & you have installed dependencies (`$bower install`)
+In order to run tests makes sure that [bower][bower] is installed & you have installed dependencies (`$bower install`)
 
 ###Testing in PhantomJS
 
-Use [`grover`][github-grover] to run tests in PhantomJS:
+Use [grover][github-grover] to run tests in PhantomJS:
 
 <pre>
 $cd /path/to/library/root
