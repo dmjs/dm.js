@@ -1,4 +1,4 @@
-#DOM markers
+#DOM Markers
 
 Gives the simple website development workflow.
 
@@ -6,7 +6,7 @@ This will allows you do not use CSS selectors to find the elements.
 
 ##Version
 
-Current version is: __*0.2.1*__
+Current version is: __*0.2.2*__
 
 ##Example
 
@@ -172,11 +172,11 @@ In order to run tests makes sure that [bower][bower] is installed & you have ins
 
 ###Testing in PhantomJS
 
-Use [grover][github-grover] to run tests in PhantomJS:
+Make sure that [grover][github-grover] is installed
 
 <pre>
 $cd /path/to/library/root
-$grover tests/unit/*.html
+$npm test
 </pre>
 
 ###Testing in *normal* browsers
