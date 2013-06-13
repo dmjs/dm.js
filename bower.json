@@ -8,5 +8,8 @@
     "node_modules",
     "components",
     "demo"
-  ]
+  ],
+  "devDependencies" : {
+    "yui3-seed": "~3.10.3"
+  }
 }

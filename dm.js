@@ -534,8 +534,8 @@ DM = (function(options) {
   };
 })({
   env     : {
-    win      : window,
-    document : document
+    win      : typeof window !== 'undefined' && window,
+    document : typeof document !== 'undefined' && document
   },
   engines : {
     j : typeof jQuery === 'function' && jQuery,
