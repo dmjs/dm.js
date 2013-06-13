@@ -414,4 +414,4 @@ YUI.add('dm-test', function (Y) {
   //todo - test detach
   //todo - test before/after priorities
 
-}, '0.2.1', {requires:['dm', 'test']});
+}, '0.2.2', {requires:['dm', 'test']});

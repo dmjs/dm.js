@@ -1,6 +1,6 @@
 {
   "name": "dm",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Gives the simple website development workflow.",
   "main": "dm.js",
   "directories": {
