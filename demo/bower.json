@@ -1,6 +1,6 @@
 {
   "name": "dm-demo",
-  "description": "DOM markers - demo",
+  "description": "DOM Markers - demo",
   "version": "0.2.1",
   "main": "dm.js",
   "ignore": [
