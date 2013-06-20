@@ -261,16 +261,15 @@ DMExec.prototype.execute = function(type){
       else {
         this._state = this._state === states.BEFORE ? states.MAIN : states.FINISHED;
         this._index = -1;
-        //this.next();
       }
       break;
     case states.MAIN:
+      this._state = states.AFTER;
+      this._index = -1;
       if (typeof module._add.callback === 'function') {
         this.context = module._add.context;
         module._add.callback.apply(this, this.args);
       }
-      this._state = states.AFTER;
-      this._index = -1;
       break;
     case states.FINISHED:
       this._state = states.INITIAL;
