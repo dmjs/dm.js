@@ -480,10 +480,7 @@ YUI.add('dm-test', function (Y) {
       Y.one('#dump').setHTML('<div id="node-a" data-marker="foo"></div>');
 
       this.nodes = {
-        a : Y.one('#node-a'),
-        b : Y.one('#node-b'),
-        c : Y.one('#node-c'),
-        d : Y.one('#node-d')
+        a : Y.one('#node-a')
       };
     },
     tearDown : function() {
@@ -841,7 +838,73 @@ YUI.add('dm-test', function (Y) {
     }
   }));
 
+  Y.Test.Runner.add(new Y.Test.Case({
+    name: 'DOM Markers : basic stop',
+
+    setUp : function() {
+      Y.one('#dump').setHTML('<div id="node-a" data-marker="foo"></div>');
+
+      this.nodes = {
+        a : Y.one('#node-a')
+      };
+    },
+    tearDown : function() {
+      Y.one('#dump').empty();
+      DM.removeAll();
+    },
+    "should stop the execution inside the before callback" : function() {
+      DM.before('foo', function() {
+        this.stop();
+      });
+      DM.add('foo', function() {
+        throw new Error('Main callback should not be executed');
+      });
+      DM.after('foo', function() {
+        throw new Error('After callback should not be executed');
+      });
+
+      DM.go();
+    },
+    "should stop the execution inside the first before callback" : function() {
+      DM.before('foo', function() {
+        this.stop();
+      });
+      DM.before('foo', function() {
+        throw new Error('Before callback should not be executed');
+      });
+      DM.add('foo', function() {
+        throw new Error('Main callback should not be executed');
+      });
+      DM.after('foo', function() {
+        throw new Error('After callback should not be executed');
+      });
+
+      DM.go();
+    },
+    "should stop the execution inside the main callback" : function() {
+      DM.add('foo', function() {
+        this.stop();
+      });
+      DM.after('foo', function() {
+        throw new Error('After callback should not be executed');
+      });
+
+      DM.go();
+    },
+    "should stop the execution inside the first after callback" : function() {
+      DM.after('foo', function() {
+        this.stop();
+      });
+      DM.after('foo', function() {
+        throw new Error('After callback should not be executed');
+      });
+
+      DM.go();
+    }
+  }));
+
   //todo - test wait with different parameters
-  //todo - test stop/next
+  //todo - test that wait isn't stop other process (other modules or elements)
+  //todo - test next
   //todo - test detach
 }, '0.2.2', {requires:['dm', 'test']});
