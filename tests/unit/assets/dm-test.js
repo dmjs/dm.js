@@ -905,6 +905,7 @@ YUI.add('dm-test', function (Y) {
 
   //todo - test wait with different parameters
   //todo - test that wait isn't stop other process (other modules or elements)
+  //todo - test concurrent modules execution
   //todo - test next
   //todo - test detach
 }, '0.2.3', {requires:['dm', 'test']});
