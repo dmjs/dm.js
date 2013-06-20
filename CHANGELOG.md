@@ -1,5 +1,8 @@
 #Changelog
 
+## 0.2.3 (Jun 20 2013)
+* fix: the exection weren't stopped with stop() in main callback
+
 ## 0.2.2 (Jun 13 2012)
 * added : package.json
 * changed : [grover][github-grover] test running changed to `npm test`
