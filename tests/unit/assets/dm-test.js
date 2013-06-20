@@ -408,10 +408,503 @@ YUI.add('dm-test', function (Y) {
     }
   }));
 
-  //todo - test wait with different parameters
-  //todo - test contexts
-  //todo - test stop/next
-  //todo - test detach
-  //todo - test before/after priorities
+  Y.Test.Runner.add(new Y.Test.Case({
+    name: 'DOM Markers : Contexts',
 
+    setUp : function() {
+      Y.one('#dump').setHTML('<div id="node-a" data-marker="foo"></div>' +
+        '<div id="node-b" data-marker="bar"></div>' +
+        '<div id="node-c" data-marker="foo,bar"></div>' +
+        '<div id="node-d" data-marker="bar,foo"></div>');
+
+      this.nodes = {
+        a : Y.one('#node-a'),
+        b : Y.one('#node-b'),
+        c : Y.one('#node-c'),
+        d : Y.one('#node-d')
+      };
+
+      //Create the contexts
+      this.contexts = {
+        fooBefore : {foo : 'before'},
+        fooMain   : {foo : 'main'},
+        fooAfter  : {foo : 'after'}
+      };
+    },
+    tearDown : function() {
+      Y.one('#dump').empty();
+      DM.removeAll();
+    },
+    "should check that before/add/after are executed with correct context" : function() {
+      var test = this,
+        mock = new Y.Mock();
+
+      Y.Mock.expect(mock, {
+        method : 'add',
+        run : function() {
+          Assert.areSame(test.contexts.fooMain, this.context, 'this.context should be same as third argument of `add`');
+        },
+        callCount : 3 //we have 3 elements with foo data marker
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'before',
+        run : function() {
+          Assert.areSame(test.contexts.fooBefore, this.context, 'this.context should be same as third argument of `before`');
+        },
+        callCount : 3 //we have 3 elements with foo data marker
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'after',
+        run : function() {
+          Assert.areSame(test.contexts.fooAfter, this.context, 'this.context should be same as third argument of `after`');
+        },
+        callCount : 3 //we have 3 elements with foo data marker
+      });
+
+      DM.add('foo', mock.add, this.contexts.fooMain);
+      DM.before('foo', mock.before, this.contexts.fooBefore);
+      DM.after('foo', mock.after, this.contexts.fooAfter);
+
+      DM.go();
+
+      Y.Mock.verify(mock);
+    }
+  }));
+
+  Y.Test.Runner.add(new Y.Test.Case({
+    name: 'DOM Markers : Priorities',
+
+    setUp : function() {
+      Y.one('#dump').setHTML('<div id="node-a" data-marker="foo"></div>');
+
+      this.nodes = {
+        a : Y.one('#node-a')
+      };
+    },
+    tearDown : function() {
+      Y.one('#dump').empty();
+      DM.removeAll();
+    },
+    "Should check priorities" : function() {
+      var test = this,
+        log = {},
+        mock = new Y.Mock();
+      
+      //create `before_m100` callback
+      Y.Mock.expect(mock, {
+        method : 'before_m100',
+        run : function() {
+          //this should be executed at very start
+          Assert.isUndefined(log.before_m100, '`before_m100` callback SHOULD NOT be executed before `before_m100`');
+          Assert.isUndefined(log.before_m10, '`before_m10` callback SHOULD NOT be executed before `before_m100`');
+          Assert.isUndefined(log.before_0, '`before_0` callback SHOULD NOT be executed before `before_m100`');
+          Assert.isUndefined(log.before, '`before` callback SHOULD NOT be executed before `before_m100`');
+          Assert.isUndefined(log.before_p10, '`before_p10` callback SHOULD NOT be executed before `before_m100`');
+          Assert.isUndefined(log.before_p100, '`before_p100` callback SHOULD NOT be executed before `before_m100`');
+
+          Assert.isUndefined(log.body, '`body` callback SHOULD NOT be executed before `body`');
+
+          Assert.isUndefined(log.after_m100, '`after_m100` callback SHOULD NOT be executed before `before_m100`');
+          Assert.isUndefined(log.after_m10, '`after_m10` callback SHOULD NOT be executed before `before_m100`');
+          Assert.isUndefined(log.after_0, '`after_0` callback SHOULD NOT be executed before `before_m100`');
+          Assert.isUndefined(log.after, '`after` callback SHOULD NOT be executed before `before_m100`');
+          Assert.isUndefined(log.after_p10, '`after_p10` callback SHOULD NOT be executed before `before_m100`');
+          Assert.isUndefined(log.after_p100, '`after_p100` callback SHOULD NOT be executed before `before_m100`');
+          
+          log.before_m100 = true;
+        }
+      });
+      //create `before_m10` callback
+      Y.Mock.expect(mock, {
+        method : 'before_m10',
+        run : function() {
+          //this should be executed after `before_m100`
+          Assert.isTrue(log.before_m100, '`before_m100` callback SHOULD be executed before `before_m10`');
+          Assert.isUndefined(log.before_m10, '`before_m10` callback SHOULD NOT be executed before `before_m10`');
+          Assert.isUndefined(log.before_0, '`before_0` callback SHOULD NOT be executed before `before_m10`');
+          Assert.isUndefined(log.before, '`before` callback SHOULD NOT be executed before `before_m10`');
+          Assert.isUndefined(log.before_p10, '`before_p10` callback SHOULD NOT be executed before `before_m10`');
+          Assert.isUndefined(log.before_p100, '`before_p100` callback SHOULD NOT be executed before `before_m10`');
+
+          Assert.isUndefined(log.body, '`body` callback SHOULD NOT be executed before `body`');
+
+          Assert.isUndefined(log.after_m100, '`after_m100` callback SHOULD NOT be executed before `before_m10`');
+          Assert.isUndefined(log.after_m10, '`after_m10` callback SHOULD NOT be executed before `before_m10`');
+          Assert.isUndefined(log.after_0, '`after_0` callback SHOULD NOT be executed before `before_m10`');
+          Assert.isUndefined(log.after, '`after` callback SHOULD NOT be executed before `before_m10`');
+          Assert.isUndefined(log.after_p10, '`after_p10` callback SHOULD NOT be executed before `before_m10`');
+          Assert.isUndefined(log.after_p100, '`after_p100` callback SHOULD NOT be executed before `before_m10`');
+          
+          log.before_m10 = true;
+        }
+      });
+      //create `before_0` callback
+      /**
+       * This callback have priority == 0, same as default;
+       * Since this callback is defined before the `before` (which priority is default) - it should be executed before
+       */
+      Y.Mock.expect(mock, {
+        method : 'before_0',
+        run : function() {
+          //this should be executed after before_m10
+          Assert.isTrue(log.before_m100, '`before_m100` callback SHOULD be executed before `before_0`');
+          Assert.isTrue(log.before_m10, '`before_m10` callback SHOULD be executed before `before_0`');
+          Assert.isUndefined(log.before_0, '`before_0` callback SHOULD NOT be executed before `before_0`');
+          Assert.isUndefined(log.before, '`before` callback SHOULD NOT be executed before `before_0`');
+          Assert.isUndefined(log.before_p10, '`before_p10` callback SHOULD NOT be executed before `before_0`');
+          Assert.isUndefined(log.before_p100, '`before_p100` callback SHOULD NOT be executed before `before_0`');
+
+          Assert.isUndefined(log.body, '`body` callback SHOULD NOT be executed before `body`');
+
+          Assert.isUndefined(log.after_m100, '`after_m100` callback SHOULD NOT be executed before `before_0`');
+          Assert.isUndefined(log.after_m10, '`after_m10` callback SHOULD NOT be executed before `before_0`');
+          Assert.isUndefined(log.after_0, '`after_0` callback SHOULD NOT be executed before `before_0`');
+          Assert.isUndefined(log.after, '`after` callback SHOULD NOT be executed before `before_0`');
+          Assert.isUndefined(log.after_p10, '`after_p10` callback SHOULD NOT be executed before `before_0`');
+          Assert.isUndefined(log.after_p100, '`after_p100` callback SHOULD NOT be executed before `before_0`');
+
+          log.before_0 = true;
+        }
+      });
+      //create `before` callback
+      Y.Mock.expect(mock, {
+        method : 'before',
+        run : function() {
+          //this should be executed after before_0
+          Assert.isTrue(log.before_m100, '`before_m100` callback SHOULD be executed before `before`');
+          Assert.isTrue(log.before_m10, '`before_m10` callback SHOULD be executed before `before`');
+          Assert.isTrue(log.before_0, '`before_0` callback SHOULD NOT be executed before `before`');
+          Assert.isUndefined(log.before, '`before` callback SHOULD NOT be executed before `before`');
+          Assert.isUndefined(log.before_p10, '`before_p10` callback SHOULD NOT be executed before `before`');
+          Assert.isUndefined(log.before_p100, '`before_p100` callback SHOULD NOT be executed before `before`');
+
+          Assert.isUndefined(log.body, '`body` callback SHOULD NOT be executed before `body`');
+
+          Assert.isUndefined(log.after_m100, '`after_m100` callback SHOULD NOT be executed before `before`');
+          Assert.isUndefined(log.after_m10, '`after_m10` callback SHOULD NOT be executed before `before`');
+          Assert.isUndefined(log.after_0, '`after_0` callback SHOULD NOT be executed before `before`');
+          Assert.isUndefined(log.after, '`after` callback SHOULD NOT be executed before `before`');
+          Assert.isUndefined(log.after_p10, '`after_p10` callback SHOULD NOT be executed before `before`');
+          Assert.isUndefined(log.after_p100, '`after_p100` callback SHOULD NOT be executed before `before`');
+          
+          log.before = true;
+        }
+      });
+
+      //create `before_p10` callback
+      Y.Mock.expect(mock, {
+        method : 'before_p10',
+        run : function() {
+          //this should be executed after before_0
+          Assert.isTrue(log.before_m100, '`before_m100` callback SHOULD be executed before `before_p10`');
+          Assert.isTrue(log.before_m10, '`before_m10` callback SHOULD be executed before `before_p10`');
+          Assert.isTrue(log.before_0, '`before_0` callback SHOULD be executed before `before_p10`');
+          Assert.isTrue(log.before, '`before` callback SHOULD be executed before `before_p10`');
+          Assert.isUndefined(log.before_p10, '`before_p10` callback SHOULD NOT be executed before `before_p10`');
+          Assert.isUndefined(log.before_p100, '`before_p100` callback SHOULD NOT be executed before `before_p10`');
+
+          Assert.isUndefined(log.body, '`body` callback SHOULD NOT be executed before `body`');
+
+          Assert.isUndefined(log.after_m100, '`after_m100` callback SHOULD NOT be executed before `before_p10`');
+          Assert.isUndefined(log.after_m10, '`after_m10` callback SHOULD NOT be executed before `before_p10`');
+          Assert.isUndefined(log.after_0, '`after_0` callback SHOULD NOT be executed before `before_p10`');
+          Assert.isUndefined(log.after, '`after` callback SHOULD NOT be executed before `before_p10`');
+          Assert.isUndefined(log.after_p10, '`after_p10` callback SHOULD NOT be executed before `before_p10`');
+          Assert.isUndefined(log.after_p100, '`after_p100` callback SHOULD NOT be executed before `before_p10`');
+          
+          log.before_p10 = true;
+        }
+      });
+      //create `before_p100` callback
+      Y.Mock.expect(mock, {
+        method : 'before_p100',
+        run : function() {
+          //this should be executed after before_p10
+          Assert.isTrue(log.before_m100, '`before_m100` callback SHOULD be executed before `before_p100`');
+          Assert.isTrue(log.before_m10, '`before_m10` callback SHOULD be executed before `before_p100`');
+          Assert.isTrue(log.before_0, '`before_0` callback SHOULD be executed before `before_p100`');
+          Assert.isTrue(log.before, '`before` callback SHOULD be executed before `before_p100`');
+          Assert.isTrue(log.before_p10, '`before_p10` callback SHOULD be executed before `before_p100`');
+          Assert.isUndefined(log.before_p100, '`before_p100` callback SHOULD NOT be executed before `before_p100`');
+
+          Assert.isUndefined(log.body, '`body` callback SHOULD NOT be executed before `before_p100`');
+
+          Assert.isUndefined(log.after_m100, '`after_m100` callback SHOULD NOT be executed before `before_p100`');
+          Assert.isUndefined(log.after_m10, '`after_m10` callback SHOULD NOT be executed before `before_p100`');
+          Assert.isUndefined(log.after_0, '`after_0` callback SHOULD NOT be executed before `before_p100`');
+          Assert.isUndefined(log.after, '`after` callback SHOULD NOT be executed before `before_p100`');
+          Assert.isUndefined(log.after_p10, '`after_p10` callback SHOULD NOT be executed before `before_p100`');
+          Assert.isUndefined(log.after_p100, '`after_p100` callback SHOULD NOT be executed before `before_p100`');
+          
+          log.before_p100 = true;
+        }
+      });
+
+      //create `after_m100` callback
+      Y.Mock.expect(mock, {
+        method : 'after_m100',
+        run : function() {
+          //this should be executed after body callback
+          Assert.isTrue(log.before_m100, '`before_m100` callback SHOULD be executed before `after_m100`');
+          Assert.isTrue(log.before_m10, '`before_m10` callback SHOULD be executed before `after_m100`');
+          Assert.isTrue(log.before_0, '`before_0` callback SHOULD be executed before `after_m100`');
+          Assert.isTrue(log.before, '`before` callback SHOULD be executed before `after_m100`');
+          Assert.isTrue(log.before_p10, '`before_p10` callback SHOULD be executed before `after_m100`');
+          Assert.isTrue(log.before_p100, '`before_p100` callback SHOULD be executed before `after_m100`');
+
+          Assert.isTrue(log.body, '`body` callback SHOULD be executed before `after_m100`');
+
+          Assert.isUndefined(log.after_m100, '`after_m100` callback SHOULD NOT be executed before `after_m100`');
+          Assert.isUndefined(log.after_m10, '`after_m10` callback SHOULD NOT be executed before `after_m100`');
+          Assert.isUndefined(log.after_0, '`after_0` callback SHOULD NOT be executed before `after_m100`');
+          Assert.isUndefined(log.after, '`after` callback SHOULD NOT be executed before `after_m100`');
+          Assert.isUndefined(log.after_p10, '`after_p10` callback SHOULD NOT be executed before `after_m100`');
+          Assert.isUndefined(log.after_p100, '`after_p100` callback SHOULD NOT be executed before `after_m100`');
+
+          log.after_m100 = true;
+        }
+      });
+      //create `after_m10` callback
+      Y.Mock.expect(mock, {
+        method : 'after_m10',
+        run : function() {
+          //this should be executed after `after_m100`
+          Assert.isTrue(log.before_m100, '`before_m100` callback SHOULD be executed before `after_m10`');
+          Assert.isTrue(log.before_m10, '`before_m10` callback SHOULD be executed before `after_m10`');
+          Assert.isTrue(log.before_0, '`before_0` callback SHOULD be executed before `after_m10`');
+          Assert.isTrue(log.before, '`before` callback SHOULD be executed before `after_m10`');
+          Assert.isTrue(log.before_p10, '`before_p10` callback SHOULD be executed before `after_m10`');
+          Assert.isTrue(log.before_p100, '`before_p100` callback SHOULD be executed before `after_m10`');
+
+          Assert.isTrue(log.body, '`body` callback SHOULD be executed before `after_m10`');
+
+          Assert.isTrue(log.after_m100, '`after_m100` callback SHOULD be executed before `after_m10`');
+          Assert.isUndefined(log.after_m10, '`after_m10` callback SHOULD NOT be executed before `after_m10`');
+          Assert.isUndefined(log.after_0, '`after_0` callback SHOULD NOT be executed before `after_m10`');
+          Assert.isUndefined(log.after, '`after` callback SHOULD NOT be executed before `after_m10`');
+          Assert.isUndefined(log.after_p10, '`after_p10` callback SHOULD NOT be executed before `after_m10`');
+          Assert.isUndefined(log.after_p100, '`after_p100` callback SHOULD NOT be executed before `after_m10`');
+
+          log.after_m10 = true;
+        }
+      });
+      //create `after_0` callback
+      /**
+       * This callback have priority == 0, same as default;
+       * Since this callback is defined before the `after` (which priority is default) - it should be executed before it
+       */
+      Y.Mock.expect(mock, {
+        method : 'after_0',
+        run : function() {
+          //this should be executed after after_m10
+          Assert.isTrue(log.before_m100, '`before_m100` callback SHOULD be executed before `after_0`');
+          Assert.isTrue(log.before_m10, '`before_m10` callback SHOULD be executed before `after_0`');
+          Assert.isTrue(log.before_0, '`before_0` callback SHOULD be executed before `after_0`');
+          Assert.isTrue(log.before, '`before` callback SHOULD be executed before `after_0`');
+          Assert.isTrue(log.before_p10, '`before_p10` callback SHOULD be executed before `after_0`');
+          Assert.isTrue(log.before_p100, '`before_p100` callback SHOULD be executed before `after_0`');
+
+          Assert.isTrue(log.body, '`body` callback SHOULD be executed before `after_0`');
+
+          Assert.isTrue(log.after_m100, '`after_m100` callback SHOULD be executed before `after_0`');
+          Assert.isTrue(log.after_m10, '`after_m10` callback SHOULD be executed before `after_0`');
+          Assert.isUndefined(log.after_0, '`after_0` callback SHOULD NOT be executed before `after_0`');
+          Assert.isUndefined(log.after, '`after` callback SHOULD NOT be executed before `after_0`');
+          Assert.isUndefined(log.after_p10, '`after_p10` callback SHOULD NOT be executed before `after_0`');
+          Assert.isUndefined(log.after_p100, '`after_p100` callback SHOULD NOT be executed before `after_0`');
+
+          log.after_0 = true;
+        }
+      });
+      //create `after` callback
+      Y.Mock.expect(mock, {
+        method : 'after',
+        run : function() {
+          //this should be executed after after_0
+          Assert.isTrue(log.before_m100, '`before_m100` callback SHOULD be executed before `after`');
+          Assert.isTrue(log.before_m10, '`before_m10` callback SHOULD be executed before `after`');
+          Assert.isTrue(log.before_0, '`before_0` callback SHOULD be executed before `after`');
+          Assert.isTrue(log.before, '`before` callback SHOULD be executed before `after`');
+          Assert.isTrue(log.before_p10, '`before_p10` callback SHOULD be executed before `after`');
+          Assert.isTrue(log.before_p100, '`before_p100` callback SHOULD be executed before `after`');
+
+          Assert.isTrue(log.body, '`body` callback SHOULD be executed before `after`');
+
+          Assert.isTrue(log.after_m100, '`after_m100` callback SHOULD be executed before `after`');
+          Assert.isTrue(log.after_m10, '`after_m10` callback SHOULD be executed before `after`');
+          Assert.isTrue(log.after_0, '`after_0` callback SHOULD NOT be executed before `after`');
+          Assert.isUndefined(log.after, '`after` callback SHOULD NOT be executed before `after`');
+          Assert.isUndefined(log.after_p10, '`after_p10` callback SHOULD NOT be executed before `after`');
+          Assert.isUndefined(log.after_p100, '`after_p100` callback SHOULD NOT be executed before `after`');
+
+          log.after = true;
+        }
+      });
+
+      //create `after_p10` callback
+      Y.Mock.expect(mock, {
+        method : 'after_p10',
+        run : function() {
+          //this should be executed after after_0
+          Assert.isTrue(log.before_m100, '`before_m100` callback SHOULD be executed before `after_p10`');
+          Assert.isTrue(log.before_m10, '`before_m10` callback SHOULD be executed before `after_p10`');
+          Assert.isTrue(log.before_0, '`before_0` callback SHOULD be executed before `after_p10`');
+          Assert.isTrue(log.before, '`before` callback SHOULD be executed before `after_p10`');
+          Assert.isTrue(log.before_p10, '`before_p10` callback SHOULD be executed before `after_p10`');
+          Assert.isTrue(log.before_p100, '`before_p100` callback SHOULD be executed before `after_p10`');
+
+          Assert.isTrue(log.body, '`body` callback SHOULD be executed before `after_p10`');
+
+          Assert.isTrue(log.after_m100, '`after_m100` callback SHOULD be executed before `after_p10`');
+          Assert.isTrue(log.after_m10, '`after_m10` callback SHOULD be executed before `after_p10`');
+          Assert.isTrue(log.after_0, '`after_0` callback SHOULD be executed before `after_p10`');
+          Assert.isTrue(log.after, '`after` callback SHOULD be executed before `after_p10`');
+          Assert.isUndefined(log.after_p10, '`after_p10` callback SHOULD NOT be executed before `after_p10`');
+          Assert.isUndefined(log.after_p100, '`after_p100` callback SHOULD NOT be executed before `after_p10`');
+
+          log.after_p10 = true;
+        }
+      });
+      //create `after_p100` callback
+      Y.Mock.expect(mock, {
+        method : 'after_p100',
+        run : function() {
+          //this should be executed after body
+          Assert.isTrue(log.before_m100, '`before_m100` callback SHOULD be executed before `after_p100`');
+          Assert.isTrue(log.before_m10, '`before_m10` callback SHOULD be executed before `after_p100`');
+          Assert.isTrue(log.before_0, '`before_0` callback SHOULD be executed before `after_p100`');
+          Assert.isTrue(log.before, '`before` callback SHOULD be executed before `after_p100`');
+          Assert.isTrue(log.before_p10, '`before_p10` callback SHOULD be executed before `after_p100`');
+          Assert.isTrue(log.before_p100, '`before_p100` callback SHOULD be executed before `after_p100`');
+
+          Assert.isTrue(log.body, '`body` callback SHOULD be executed before `after_p100`');
+
+          Assert.isTrue(log.after_m100, '`after_m100` callback SHOULD be executed before `after_p100`');
+          Assert.isTrue(log.after_m10, '`after_m10` callback SHOULD be executed before `after_p100`');
+          Assert.isTrue(log.after_0, '`after_0` callback SHOULD be executed before `after_p100`');
+          Assert.isTrue(log.after, '`after` callback SHOULD be executed before `after_p100`');
+          Assert.isTrue(log.after_p10, '`after_p10` callback SHOULD be executed before `after_p100`');
+          Assert.isUndefined(log.after_p100, '`after_p100` callback SHOULD NOT be executed before `after_p100`');
+
+          log.after_p100 = true;
+        }
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'body',
+        run : function() {
+          //this should be executed after before_p100
+          Assert.isTrue(log.before_m100, '`before_m100` callback SHOULD be executed before `body`');
+          Assert.isTrue(log.before_m10, '`before_m10` callback SHOULD be executed before `body`');
+          Assert.isTrue(log.before_0, '`before_0` callback SHOULD be executed before `body`');
+          Assert.isTrue(log.before, '`before` callback SHOULD be executed before `body`');
+          Assert.isTrue(log.before_p10, '`before_p10` callback SHOULD be executed before `body`');
+          Assert.isTrue(log.before_p100, '`before_p100` callback SHOULD be executed before `body`');
+
+          Assert.isUndefined(log.body, '`body` callback SHOULD NOT be executed before `body`');
+
+          Assert.isUndefined(log.after_m100, '`after_m100` callback SHOULD NOT be executed before `body`');
+          Assert.isUndefined(log.after_m10, '`after_m10` callback SHOULD NOT be executed before `body`');
+          Assert.isUndefined(log.after_0, '`after_0` callback SHOULD NOT be executed before `body`');
+          Assert.isUndefined(log.after, '`after` callback SHOULD NOT be executed before `body`');
+          Assert.isUndefined(log.after_p10, '`after_p10` callback SHOULD NOT be executed before `body`');
+          Assert.isUndefined(log.after_p100, '`after_p100` callback SHOULD NOT be executed before `body`');
+
+          log.body = true;
+        }
+      });
+
+      DM.before('foo', mock.before_p100, null, 100);
+      DM.before('foo', mock.before_p10, null, 10);
+      DM.before('foo', mock.before_0, null, 0);
+      DM.before('foo', mock.before_m10, null, -10);
+      DM.before('foo', mock.before_m100, null, -100);
+      DM.before('foo', mock.before, null);
+
+      DM.add('foo', mock.body);
+
+      DM.after('foo', mock.after_p100, null, 100);
+      DM.after('foo', mock.after_p10, null, 10);
+      DM.after('foo', mock.after_0, null, 0);
+      DM.after('foo', mock.after_m10, null, -10);
+      DM.after('foo', mock.after_m100, null, -100);
+      DM.after('foo', mock.after, null);
+
+      DM.go();
+
+      Y.Mock.verify(mock);
+    }
+  }));
+
+  Y.Test.Runner.add(new Y.Test.Case({
+    name: 'DOM Markers : basic stop',
+
+    setUp : function() {
+      Y.one('#dump').setHTML('<div id="node-a" data-marker="foo"></div>');
+
+      this.nodes = {
+        a : Y.one('#node-a')
+      };
+    },
+    tearDown : function() {
+      Y.one('#dump').empty();
+      DM.removeAll();
+    },
+    "should stop the execution inside the before callback" : function() {
+      DM.before('foo', function() {
+        this.stop();
+      });
+      DM.add('foo', function() {
+        throw new Error('Main callback should not be executed');
+      });
+      DM.after('foo', function() {
+        throw new Error('After callback should not be executed');
+      });
+
+      DM.go();
+    },
+    "should stop the execution inside the first before callback" : function() {
+      DM.before('foo', function() {
+        this.stop();
+      });
+      DM.before('foo', function() {
+        throw new Error('Before callback should not be executed');
+      });
+      DM.add('foo', function() {
+        throw new Error('Main callback should not be executed');
+      });
+      DM.after('foo', function() {
+        throw new Error('After callback should not be executed');
+      });
+
+      DM.go();
+    },
+    "should stop the execution inside the main callback" : function() {
+      DM.add('foo', function() {
+        this.stop();
+      });
+      DM.after('foo', function() {
+        throw new Error('After callback should not be executed');
+      });
+
+      DM.go();
+    },
+    "should stop the execution inside the first after callback" : function() {
+      DM.after('foo', function() {
+        this.stop();
+      });
+      DM.after('foo', function() {
+        throw new Error('After callback should not be executed');
+      });
+
+      DM.go();
+    }
+  }));
+
+  //todo - test wait with different parameters
+  //todo - test that wait isn't stop other process (other modules or elements)
+  //todo - test next
+  //todo - test detach
 }, '0.2.2', {requires:['dm', 'test']});
