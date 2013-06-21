@@ -1,5 +1,18 @@
 #Changelog
 
+## 0.2.3 (Jun 20 2013)
+* fix: the exection weren't stopped with stop() in main callback
+
+## 0.2.2 (Jun 13 2012)
+* added : package.json
+* changed : [grover][github-grover] test running changed to `npm test`
+* added : new tests
+* added : Gruntfile.js file and uglify task
+* added : minified file `dm.min.js`
+
+## 0.2.1 (Jun 13 2013)
+* changed : since now, you can execute newly created (after removing) module with the same name as of previously applied
+
 ## 0.2.0 (Jun 13 2013)
 * changed: the modules worlflow. DMExec doesn't look at the callback return value since now
 * changed : `before/after/add` now returns the uuid of the callback;
@@ -14,3 +27,4 @@
 * changed: demos
 
 [readme]:README.md
+[github-grover]:https://github.com/yui/grover

@@ -1,12 +1,15 @@
 {
   "name": "dm",
-  "description": "DOM markers",
-  "version": "0.2.0",
+  "description": "DOM Markers",
+  "version": "0.2.3",
   "main": "dm.js",
   "ignore": [
     "**/.*",
     "node_modules",
     "components",
     "demo"
-  ]
+  ],
+  "devDependencies" : {
+    "yui3-seed": "~3.10.3"
+  }
 }

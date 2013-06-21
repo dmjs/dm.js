@@ -1,4 +1,4 @@
-#DOM markers
+#DOM Markers
 
 Gives the simple website development workflow.
 
@@ -6,7 +6,7 @@ This will allows you do not use CSS selectors to find the elements.
 
 ##Version
 
-Current version is: __*0.2.0*__
+Current version is: __*0.2.3*__
 
 ##Example
 
@@ -55,9 +55,9 @@ Define the module. It have 3 arguments:
 * {Any} optional context; default - `undefined`
 
 <pre>
-    DM.add('moduleName', function(/*will take arguments from the DOM element*/) {
-        /*Your code goes here*/
-    }, {module:'context'});
+DM.add('moduleName', function(/*will take arguments from the DOM element*/) {
+    /*Your code goes here*/
+}, {module:'context'});
 </pre>
 
 ###before & after
@@ -72,9 +72,9 @@ Accept 4 arguments:
 * {Number} optional weight; default - `0`; Lower values have a higher priority
 
 <pre>
-    DM.before('moduleName', function(/*will take arguments from the DOM element*/) {
-        /*Your code goes here*/
-    }, {module:'context'});
+DM.before('moduleName', function(/*will take arguments from the DOM element*/) {
+    /*Your code goes here*/
+}, {module:'context'});
 </pre>
 
 ###go
@@ -94,9 +94,9 @@ Accept uuid of callback;
 Example:
 
 <pre>
-    var beforeUuid = DM.before('module', function(){});
+var beforeUuid = DM.before('module', function(){});
 
-    DM.detach(beforeUuid);
+DM.detach(beforeUuid);
 </pre>
 
 
@@ -105,11 +105,11 @@ Example:
 Removes module from DM registry
 
 <pre>
-    DM.add('module', function(){});
-    DM.before('module', function(){});
-    DM.after('module', function(){});
+DM.add('module', function(){});
+DM.before('module', function(){});
+DM.after('module', function(){});
 
-    DM.remove('module');
+DM.remove('module');
 </pre>
 
 ###removeAll
@@ -117,12 +117,11 @@ Removes module from DM registry
 Removes all modules from DM registry
 
 <pre>
-    DM.add('module1', function(){});
-    DM.add('module2', function(){});
-    DM.add('module3', function(){});
+DM.add('module1', function(){});
+DM.add('module2', function(){});
+DM.add('module3', function(){});
 
-    DM.removeAll().go();//neither modules will be executed
-
+DM.removeAll().go();//neither modules will be executed
 </pre>
 
 ###wait
@@ -166,6 +165,23 @@ Accept two optional arguments:
 * `node` - target DOM Element
 * `state` & `index` - internal properties
 
+##Running tests
+
+In order to run tests makes sure that [bower][bower] is installed & you have installed dependencies (`$bower install`)
+
+###Testing in PhantomJS
+
+Make sure that [grover][github-grover] is installed
+
+<pre>
+$cd /path/to/library/root
+$npm test
+</pre>
+
+###Testing in *normal* browsers
+
+simply open `tests/unit/dm.html` in browser & check the output of the testing console
+
 ##Release History
 
 See the [Changelog][changelog]
@@ -182,3 +198,4 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 [changelog]:CHANGELOG.md
 [release]:https://github.com/jslayer/dm.js/zipball/master
 [bower]:http://bower.io/
+[github-grover]:https://github.com/yui/grover

@@ -1,5 +1,5 @@
 /*
- * DOM Markers 0.2.0
+ * DOM Markers 0.2.3
  * Copyright 2013 Eugene Poltorakov
  * Licensed under the MIT License: http://www.opensource.org/licenses/mit-license.php
  */
@@ -80,14 +80,17 @@ DMUtils = {
   filter : function(arr, callback) {
     return arr.filter(callback);
   },
-  filterModules : function(node, modules) {
-    return DMUtils.filter(modules, function(module) {
+  filterModules : function(node, list, modules) {
+    return DMUtils.filter(list, function(module) {
       var _data = node._dm || (node._dm = {}),
+        uuid,
         result = false;
 
-      if (!_data[module.name]) {
-        _data[module.name] = true;
-        result = true;
+      //should set result to true, if module where not processed for this node
+      uuid = modules[module.name] && modules[module.name].uuid;
+
+      if (!_data[uuid]) {
+        result = _data[uuid] = true;
       }
       return result;
     });
@@ -258,16 +261,17 @@ DMExec.prototype.execute = function(type){
       else {
         this._state = this._state === states.BEFORE ? states.MAIN : states.FINISHED;
         this._index = -1;
-        //this.next();
       }
       break;
     case states.MAIN:
+      //the 2 lines of code below fix isn't so actually good.
+      this._state = states.AFTER;
+      this._index = -1;
+      //todo - should provide correct state & index properties inside current execution context
       if (typeof module._add.callback === 'function') {
         this.context = module._add.context;
         module._add.callback.apply(this, this.args);
       }
-      this._state = states.AFTER;
-      this._index = -1;
       break;
     case states.FINISHED:
       this._state = states.INITIAL;
@@ -443,7 +447,7 @@ DM = (function(options) {
         DMUtils.each(Array.prototype.slice.call(nodes), function(node) {
           var modules = DMUtils.getModules(node);
 
-          modules = DMUtils.filterModules(node, modules);
+          modules = DMUtils.filterModules(node, modules, _modules);
 
           DMUtils.each(modules, function(data) {
             var module = getModule(data.name);
@@ -457,8 +461,8 @@ DM = (function(options) {
       return this;
     },
     /**
-     *
      * @param {Number} uuid
+     * @return {DMExec}
      */
     detach : function(uuid) {
       var name,
@@ -534,8 +538,8 @@ DM = (function(options) {
   };
 })({
   env     : {
-    win      : window,
-    document : document
+    win      : typeof window !== 'undefined' && window,
+    document : typeof document !== 'undefined' && document
   },
   engines : {
     j : typeof jQuery === 'function' && jQuery,
