@@ -462,6 +462,7 @@ DM = (function(options) {
     },
     /**
      * @param {Number} uuid
+     * @return {DMExec}
      */
     detach : function(uuid) {
       var name,
