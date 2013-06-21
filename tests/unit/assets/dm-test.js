@@ -903,9 +903,138 @@ YUI.add('dm-test', function (Y) {
     }
   }));
 
+  Y.Test.Runner.add(new Y.Test.Case({
+    name: 'DOM Markers : Testing DM.detach',
+
+    setUp : function() {
+      Y.one('#dump').setHTML('<div id="node-a" data-marker="foo"></div>');
+
+      this.nodes = {
+        a : Y.one('#node-a')
+      };
+    },
+    tearDown : function() {
+      Y.one('#dump').empty();
+      DM.removeAll();
+    },
+    "should detach first before but execute body & after" : function() {
+      var test = this,
+        mock = new Y.Mock(),
+        ids = {};
+
+      Y.Mock.expect(mock, {
+        method : 'before',
+        callCount: 0
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'body'
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'after'
+      });
+
+      ids.before = DM.before('foo', mock.before);
+      ids.body = DM.before('foo', mock.body);
+      ids.after = DM.before('foo', mock.after);
+
+      DM.detach(ids.before);
+
+      DM.go();
+
+      Y.Mock.verify(mock);
+    },
+    "should detach body callback but execute before & after" : function() {
+      var test = this,
+        mock = new Y.Mock(),
+        ids = {};
+
+      Y.Mock.expect(mock, {
+        method : 'before'
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'body',
+        callCount: 0
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'after'
+      });
+
+      ids.before = DM.before('foo', mock.before);
+      ids.body = DM.before('foo', mock.body);
+      ids.after = DM.before('foo', mock.after);
+
+      DM.detach(ids.body);
+
+      DM.go();
+
+      Y.Mock.verify(mock);
+    },
+    "should detach after callback but execute before & body" : function() {
+      var test = this,
+        mock = new Y.Mock(),
+        ids = {};
+
+      Y.Mock.expect(mock, {
+        method : 'before'
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'body'
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'after',
+        callCount: 0
+      });
+
+      ids.before = DM.before('foo', mock.before);
+      ids.body = DM.before('foo', mock.body);
+      ids.after = DM.before('foo', mock.after);
+
+      DM.detach(ids.after);
+
+      DM.go();
+
+      Y.Mock.verify(mock);
+    },
+    "should validate chaining detach" : function() {
+      var test = this,
+        mock = new Y.Mock(),
+        ids = {};
+
+      Y.Mock.expect(mock, {
+        method : 'before',
+        callCount: 0
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'body',
+        callCount: 0
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'after',
+        callCount: 0
+      });
+
+      ids.before = DM.before('foo', mock.before);
+      ids.body = DM.before('foo', mock.body);
+      ids.after = DM.before('foo', mock.after);
+
+      DM.detach(ids.before).detach(ids.after).detach(ids.body);
+
+      DM.go();
+
+      Y.Mock.verify(mock);
+    }
+  }));
+
   //todo - test wait with different parameters
   //todo - test that wait isn't stop other process (other modules or elements)
   //todo - test concurrent modules execution
   //todo - test next
-  //todo - test detach
 }, '0.2.3', {requires:['dm', 'test']});
