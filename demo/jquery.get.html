@@ -30,14 +30,14 @@
      * Set node to loading state
      */
     DM.before('get', function() {
-      return $(this.node).addClass('loading');
+      $(this.node).addClass('loading');
     });
 
     /**
      * Remove loading state from the node
      */
     DM.after('get', function() {
-      return $(this.node).removeClass('loading');
+      $(this.node).removeClass('loading');
     });
 
     /**
@@ -48,6 +48,8 @@
         $(this.node).html(html);
         this.next();
       }, this);
+
+      this.wait(2000);
 
       setTimeout(function() {
         $.get(url, cb);

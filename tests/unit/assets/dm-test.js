@@ -42,7 +42,7 @@ YUI.add('dm-test', function (Y) {
       DM.removeAll();
     },
 
-    "color module should apply correct color values" : function() {
+    "Should apply correct color values" : function() {
       Assert.areSame('red', this.nodes.a.getStyle('color'), '#node-a should have red color');
       Assert.areSame('green', this.nodes.b.getStyle('color'), '#node-b should have green color');
       Assert.areSame('blue', this.nodes.c.getStyle('color'), '#node-c should have blue color');
@@ -50,25 +50,25 @@ YUI.add('dm-test', function (Y) {
       Assert.areSame('white', this.nodes.e.getStyle('color'), '#node-e should have white color');
     },
 
-    "`small` module should set node font-size to 10px" : function() {
+    "Should set font size to 10px" : function() {
       Assert.areSame('10px', this.nodes.a.getStyle('fontSize'));
     },
 
-    "`big` module should set node font-size to 24px" : function() {
+    "Should set font size to 24px" : function() {
       Assert.areSame('24px', this.nodes.b.getStyle('fontSize'));
     },
 
-    "#node-c modules order: small, big; big should be applied later" : function() {
+    "Should verify execution order small > big > big" : function() {
       Assert.areSame('24px', this.nodes.c.getStyle('fontSize'));
     },
 
-    "#node-d modules order: big, small; small should be applied later" : function() {
+    "Should verify execution order big > small > small" : function() {
       Assert.areSame('10px', this.nodes.d.getStyle('fontSize'));
     }
   }));
 
   Y.Test.Runner.add(new Y.Test.Case({
-    name: 'DOM Markers : Basic testing of before & after',
+    name: 'DOM Markers : Basic testing of DM.before & DM.after',
 
     setUp : function() {
       Y.one('#dump').setHTML('' +
@@ -117,15 +117,15 @@ YUI.add('dm-test', function (Y) {
       DM.removeAll();
     },
 
-    "`onlyBefore` module should insert HTML into target node" : function() {
+    "Should insert correct HTML with `onlyBefore` module" : function() {
       Assert.areSame('this is before-only module', this.nodes.a.getHTML());
     },
 
-    "`onlyAfter` module should insert HTML into target node" : function() {
+    "Should insert correct HTML with `onlyAfter` module" : function() {
       Assert.areSame('this is after-only module', this.nodes.b.getHTML());
     },
 
-    "`moduleWithBeforeAndAfter` module should insert HTML into target node" : function() {
+    "Should insert correct HTML with `moduleWithBeforeAndAfter` module" : function() {
       Assert.areSame('(before)(add)(after)', this.nodes.c.getHTML());
     }
   }));
@@ -219,21 +219,21 @@ YUI.add('dm-test', function (Y) {
       DM.removeAll();
     },
 
-    "#node-a should be blue/yellow 21px with '{batch}' innerHTML" : function() {
+    "Should check that #node-a have blue/yellow 21px and correct innerHTML" : function() {
       Assert.areSame('blue', this.nodes.a.getStyle('color'), '#node-a color should be blue');
       Assert.areSame('yellow', this.nodes.a.getStyle('backgroundColor'), '#node-a backgroundColor should be yellow');
       Assert.areSame('21px', this.nodes.a.getStyle('fontSize'), '#node-a fontSize should be 21px');
       Assert.areSame('{batch}', this.nodes.a.getHTML(), '#node-a innerHTML should be "{batch}"');
     },
 
-    "#node-b should be white/black 7px with '{empty}' innerHTML" : function() {
+    "Should check that #node-b have white/black 7px and correct innerHTML" : function() {
       Assert.areSame('white', this.nodes.b.getStyle('color'), '#node-b color should be white');
       Assert.areSame('black', this.nodes.b.getStyle('backgroundColor'), '#node-b backgroundColor should be black');
       Assert.areSame('7px', this.nodes.b.getStyle('fontSize'), '#node-b fontSize should be 7px');
       Assert.areSame('{empty}', this.nodes.b.getHTML(), '#node-b innerHTML should be "{empty}"');
     },
 
-    "#node-c should be red/black 7px with 'hello world' innerHTML" : function() {
+    "Should check that #node-b have red/black 7px and correct innerHTML" : function() {
       Assert.areSame('red', this.nodes.c.getStyle('color'), '#node-c color should be blue');
       Assert.areSame('black', this.nodes.c.getStyle('backgroundColor'), '#node-c backgroundColor should be yellow');
       Assert.areSame('7px', this.nodes.c.getStyle('fontSize'), '#node-c fontSize should be 21px');
@@ -277,23 +277,23 @@ YUI.add('dm-test', function (Y) {
       Y.one('#dump').empty();
       DM.removeAll();
     },
-    "should check initial node content" : function() {
+    "Should check initial node content" : function() {
       Assert.areSame('hello', this.nodes.a.getHTML());
     },
-    "should check if the 'module' works properly" : function() {
+    "Should check if the 'module' works properly" : function() {
       DM.go();
       Assert.areSame('[hello world!!!]', this.nodes.a.getHTML());
     },
-    "should verify that removed module will not be executed" : function() {
+    "Should verify that removed module will not be executed" : function() {
       DM.remove('module').go();
       Assert.areSame('hello', this.nodes.a.getHTML());
     },
-    "should throw an error when trying to redefine module existing body" : function() {
+    "Should throw an error when trying to redefine module existing body" : function() {
       DM.add('module', function() {
         this.node.innerHTML += ' nobody';
       });
     },
-    "should remove existing & create new module" : function() {
+    "Should remove existing & create new module" : function() {
       DM.remove('module');
       DM.before('module', function() {
         this.node.innerHTML = '* ' + this.node.innerHTML;
@@ -310,7 +310,7 @@ YUI.add('dm-test', function (Y) {
       DM.go();
       Assert.areSame('* hello anyone! *', this.nodes.a.getHTML());
     },
-    "should check than both existing & new module could be applied for one node" : function() {
+    "Should check than both existing & new module could be applied for one node" : function() {
       //this will fail in version before 0.2.1
       DM.go();
       DM.remove('module');
@@ -389,7 +389,7 @@ YUI.add('dm-test', function (Y) {
       Y.one('#dump').empty();
       DM.removeAll();
     },
-    "should execute modules just once and get an expected results" : function() {
+    "Should execute modules just once and get an expected results" : function() {
       DM.go();
       Assert.areSame('Hello Mr. Foo! :) ', this.nodes.a.getHTML(), '#node-a content should be valid');
       Assert.areSame('Good bye Mrs. Bar ! =) ', this.nodes.b.getHTML(), '#node-b content should be valid');
@@ -397,7 +397,7 @@ YUI.add('dm-test', function (Y) {
       Assert.areSame('Good bye Mrs. Bar ! =) Hello Mr. Foo! :) ', this.nodes.d.getHTML(), '#node-d content should be valid');
       Assert.areSame('Hello Mr. Foo! :) ', this.nodes.e.getHTML(), '#node-e content should be valid');
     },
-    "show execute modules twice and get results only of second execution" : function() {
+    "Show execute DM.go() twice and check that modules were executed only once per node" : function() {
       DM.go();
       DM.go();
       Assert.areSame('Hello Mr. Foo! :) ', this.nodes.a.getHTML(), '#node-a content should be valid');
@@ -409,7 +409,7 @@ YUI.add('dm-test', function (Y) {
   }));
 
   Y.Test.Runner.add(new Y.Test.Case({
-    name: 'DOM Markers : Contexts',
+    name: 'DOM Markers : Testing contexts',
 
     setUp : function() {
       Y.one('#dump').setHTML('<div id="node-a" data-marker="foo"></div>' +
@@ -435,7 +435,7 @@ YUI.add('dm-test', function (Y) {
       Y.one('#dump').empty();
       DM.removeAll();
     },
-    "should check that before/add/after are executed with correct context" : function() {
+    "Should check that before/add/after are executed with correct context" : function() {
       var test = this,
         mock = new Y.Mock();
 
@@ -474,7 +474,7 @@ YUI.add('dm-test', function (Y) {
   }));
 
   Y.Test.Runner.add(new Y.Test.Case({
-    name: 'DOM Markers : Priorities',
+    name: 'DOM Markers : Testing execution priorities',
 
     setUp : function() {
       Y.one('#dump').setHTML('<div id="node-a" data-marker="foo"></div>');
@@ -839,7 +839,7 @@ YUI.add('dm-test', function (Y) {
   }));
 
   Y.Test.Runner.add(new Y.Test.Case({
-    name: 'DOM Markers : basic stop',
+    name: 'DOM Markers : Testing DMExec.stop()',
 
     setUp : function() {
       Y.one('#dump').setHTML('<div id="node-a" data-marker="foo"></div>');
@@ -852,7 +852,7 @@ YUI.add('dm-test', function (Y) {
       Y.one('#dump').empty();
       DM.removeAll();
     },
-    "should stop the execution inside the before callback" : function() {
+    "Should stop the execution inside the before callback" : function() {
       DM.before('foo', function() {
         this.stop();
       });
@@ -865,7 +865,7 @@ YUI.add('dm-test', function (Y) {
 
       DM.go();
     },
-    "should stop the execution inside the first before callback" : function() {
+    "Should stop the execution inside the first before callback" : function() {
       DM.before('foo', function() {
         this.stop();
       });
@@ -881,7 +881,7 @@ YUI.add('dm-test', function (Y) {
 
       DM.go();
     },
-    "should stop the execution inside the main callback" : function() {
+    "Should stop the execution inside the main callback" : function() {
       DM.add('foo', function() {
         this.stop();
       });
@@ -891,7 +891,7 @@ YUI.add('dm-test', function (Y) {
 
       DM.go();
     },
-    "should stop the execution inside the first after callback" : function() {
+    "Should stop the execution inside the first after callback" : function() {
       DM.after('foo', function() {
         this.stop();
       });
@@ -903,8 +903,138 @@ YUI.add('dm-test', function (Y) {
     }
   }));
 
+  Y.Test.Runner.add(new Y.Test.Case({
+    name: 'DOM Markers : Testing DM.detach',
+
+    setUp : function() {
+      Y.one('#dump').setHTML('<div id="node-a" data-marker="foo"></div>');
+
+      this.nodes = {
+        a : Y.one('#node-a')
+      };
+    },
+    tearDown : function() {
+      Y.one('#dump').empty();
+      DM.removeAll();
+    },
+    "Should detach first before but execute body & after" : function() {
+      var test = this,
+        mock = new Y.Mock(),
+        ids = {};
+
+      Y.Mock.expect(mock, {
+        method : 'before',
+        callCount: 0
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'body'
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'after'
+      });
+
+      ids.before = DM.before('foo', mock.before);
+      ids.body = DM.before('foo', mock.body);
+      ids.after = DM.before('foo', mock.after);
+
+      DM.detach(ids.before);
+
+      DM.go();
+
+      Y.Mock.verify(mock);
+    },
+    "Should detach body callback but execute before & after" : function() {
+      var test = this,
+        mock = new Y.Mock(),
+        ids = {};
+
+      Y.Mock.expect(mock, {
+        method : 'before'
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'body',
+        callCount: 0
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'after'
+      });
+
+      ids.before = DM.before('foo', mock.before);
+      ids.body = DM.before('foo', mock.body);
+      ids.after = DM.before('foo', mock.after);
+
+      DM.detach(ids.body);
+
+      DM.go();
+
+      Y.Mock.verify(mock);
+    },
+    "Should detach after callback but execute before & body" : function() {
+      var test = this,
+        mock = new Y.Mock(),
+        ids = {};
+
+      Y.Mock.expect(mock, {
+        method : 'before'
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'body'
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'after',
+        callCount: 0
+      });
+
+      ids.before = DM.before('foo', mock.before);
+      ids.body = DM.before('foo', mock.body);
+      ids.after = DM.before('foo', mock.after);
+
+      DM.detach(ids.after);
+
+      DM.go();
+
+      Y.Mock.verify(mock);
+    },
+    "Should validate chaining detach" : function() {
+      var test = this,
+        mock = new Y.Mock(),
+        ids = {};
+
+      Y.Mock.expect(mock, {
+        method : 'before',
+        callCount: 0
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'body',
+        callCount: 0
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'after',
+        callCount: 0
+      });
+
+      ids.before = DM.before('foo', mock.before);
+      ids.body = DM.before('foo', mock.body);
+      ids.after = DM.before('foo', mock.after);
+
+      DM.detach(ids.before).detach(ids.after).detach(ids.body);
+
+      DM.go();
+
+      Y.Mock.verify(mock);
+    }
+  }));
+
   //todo - test wait with different parameters
   //todo - test that wait isn't stop other process (other modules or elements)
+  //todo - test concurrent modules execution
   //todo - test next
-  //todo - test detach
 }, '0.2.3', {requires:['dm', 'test']});

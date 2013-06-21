@@ -264,8 +264,10 @@ DMExec.prototype.execute = function(type){
       }
       break;
     case states.MAIN:
+      //the 2 lines of code below fix isn't so actually good.
       this._state = states.AFTER;
       this._index = -1;
+      //todo - should provide correct state & index properties inside current execution context
       if (typeof module._add.callback === 'function') {
         this.context = module._add.context;
         module._add.callback.apply(this, this.args);
@@ -460,6 +462,7 @@ DM = (function(options) {
     },
     /**
      * @param {Number} uuid
+     * @return {DMExec}
      */
     detach : function(uuid) {
       var name,
