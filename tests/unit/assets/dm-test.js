@@ -68,7 +68,7 @@ YUI.add('dm-test', function (Y) {
   }));
 
   Y.Test.Runner.add(new Y.Test.Case({
-    name: 'DOM Markers : Basic testing of before & after',
+    name: 'DOM Markers : Basic testing of DM.before & DM.after',
 
     setUp : function() {
       Y.one('#dump').setHTML('' +
@@ -409,7 +409,7 @@ YUI.add('dm-test', function (Y) {
   }));
 
   Y.Test.Runner.add(new Y.Test.Case({
-    name: 'DOM Markers : Contexts',
+    name: 'DOM Markers : Testing contexts',
 
     setUp : function() {
       Y.one('#dump').setHTML('<div id="node-a" data-marker="foo"></div>' +
@@ -474,7 +474,7 @@ YUI.add('dm-test', function (Y) {
   }));
 
   Y.Test.Runner.add(new Y.Test.Case({
-    name: 'DOM Markers : Priorities',
+    name: 'DOM Markers : Testing execution priorities',
 
     setUp : function() {
       Y.one('#dump').setHTML('<div id="node-a" data-marker="foo"></div>');
@@ -839,7 +839,7 @@ YUI.add('dm-test', function (Y) {
   }));
 
   Y.Test.Runner.add(new Y.Test.Case({
-    name: 'DOM Markers : basic stop',
+    name: 'DOM Markers : Testing DMExec.stop()',
 
     setUp : function() {
       Y.one('#dump').setHTML('<div id="node-a" data-marker="foo"></div>');
