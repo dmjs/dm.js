@@ -1279,4 +1279,4 @@ YUI.add('dm-test', function (Y) {
       }, 300);
     }
   }));
-}, '0.2.3', {requires:['dm', 'test']});
+}, '0.2.4', {requires:['dm', 'test']});
