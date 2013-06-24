@@ -1169,7 +1169,114 @@ YUI.add('dm-test', function (Y) {
     }
   }));
 
-  //todo - test that wait isn't stop other process (other modules or elements)
-  //todo - test concurrent modules execution
-  //todo - test next
+  Y.Test.Runner.add(new Y.Test.Case({
+    name: 'DOM Markers : Testing DMExec.next',
+    setUp : function() {
+      Y.one('#dump').setHTML('<div id="node-a" data-marker="foo"></div>');
+
+      this.nodes = {
+        a : Y.one('#node-a')
+      };
+    },
+    tearDown : function() {
+      Y.one('#dump').empty();
+      DM.removeAll();
+    },
+    "Should continue execution by calling next() before stop timeout is fired" : function() {
+      var mock = new Y.Mock,
+        callback;
+
+      callback = function() {
+        var exec = this;
+
+        Y.later(25, this, function() {
+          this.next();
+        });
+
+        //will stop if next will not be called
+        this.wait(50, true);
+      };
+
+      Y.Mock.expect(mock, {
+        method : 'before',
+        run    : callback
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'body',
+        run    : callback
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'after',
+        run    : callback
+      });
+
+      DM.before('foo', mock.before);
+      DM.add('foo', mock.body);
+      DM.after('foo', mock.after);
+
+      DM.go();
+
+      this.wait(function() {
+        Y.Mock.verify(mock);
+      }, 300);
+    }
+  }));
+
+  Y.Test.Runner.add(new Y.Test.Case({
+    name: 'DOM Markers : Test concurrent modules execution',
+    setUp : function() {
+      Y.one('#dump').setHTML('<div id="node-a" data-marker="foo,bar"></div>');
+
+      this.nodes = {
+        a : Y.one('#node-a')
+      };
+    },
+    tearDown : function() {
+      Y.one('#dump').empty();
+      DM.removeAll();
+    },
+    "Should execute foo:body (with DMExec.wait) > bar:body > foo:after" : function() {
+      var mock = new Y.Mock,
+        test = this,
+        log = [];
+
+      Y.Mock.expect(mock, {
+        method : 'fooBody',
+        run : function() {
+          log.push('foo:body');
+          this.wait(50);
+        }
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'fooAfter',
+        run : function() {
+          log.push('foo:after');
+        }
+      });
+
+      Y.Mock.expect(mock, {
+        method : 'barBody',
+        run : function() {
+          log.push('bar:body');
+        }
+      });
+
+      DM.add('foo', mock.fooBody);
+
+      DM.after('foo', mock.fooAfter);
+
+      DM.add('bar', mock.barBody);
+
+      DM.go();
+
+      this.wait(function() {
+        Assert.areSame('foo:body,bar:body,foo:after', log.join(','), 'Execution order is not correct');
+
+        Y.Mock.verify(mock);
+      }, 300);
+    }
+  }));
 }, '0.2.3', {requires:['dm', 'test']});
