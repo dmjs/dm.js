@@ -6,7 +6,7 @@ This will allows you do not use CSS selectors to find the elements.
 
 ##Version
 
-Current version is: __*0.2.3*__
+Current version is: __*0.2.4*__
 
 ##Example
 

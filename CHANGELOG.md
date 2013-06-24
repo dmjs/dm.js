@@ -1,5 +1,9 @@
 #Changelog
 
+## 0.2.4 (Jun 25 2013)
+* added : latest basic tests
+* changed : todo
+
 ## 0.2.3 (Jun 20 2013)
 * fix: the exection weren't stopped with stop() in main callback
 
