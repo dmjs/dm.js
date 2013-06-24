@@ -246,7 +246,7 @@ YUI.add('dm-test', function (Y) {
 
     _should : {
       error : {
-        "should throw an error when trying to redefine module existing body" : 'Module(module) main callback is already defined'
+        "Should throw an error when trying to redefine module existing body" : 'Module(module) main callback is already defined'
       }
     },
 
@@ -1033,7 +1033,142 @@ YUI.add('dm-test', function (Y) {
     }
   }));
 
-  //todo - test wait with different parameters
+  Y.Test.Runner.add(new Y.Test.Case({
+    name: 'DOM Markers : Testing DMExec.wait()',
+    setUp : function() {
+      Y.one('#dump').setHTML('<div id="node-a" data-marker="foo"></div>');
+
+      this.nodes = {
+        a : Y.one('#node-a')
+      };
+    },
+    tearDown : function() {
+      Y.one('#dump').empty();
+      DM.removeAll();
+    },
+    "Should continue after timeout" : function() {
+      var test = this;
+
+      DM.add('foo', function() {
+        this.wait(200, false);
+      });
+
+      DM.after('foo', function() {
+        test.resume();
+      });
+
+      DM.go();
+
+      this.wait(500);
+    },
+    "Should stop after timeout" : function() {
+      DM.add('foo', function() {
+        this.wait(100, true);
+      });
+
+      DM.after('foo', function() {
+        throw new Error('foo:after should not be called');
+      });
+
+      DM.go();
+
+      this.wait(function() {
+        //everything is ok
+      }, 200);
+    },
+    "Should wait 200 ms in 'before' section and makes sure that timeout is nearly accurate" : function() {
+      var start,
+        delta;
+
+      DM.before('foo', function() {
+        this.wait(200, false);
+      });
+
+      DM.after('foo', function() {
+        delta = Date.now() - start;
+      });
+
+      start = Date.now();
+
+      DM.go();
+
+      this.wait(function() {
+        Assert.isNotUndefined(delta, 'Delta should not be undefined');
+        if (Math.abs(delta - 200) > 2) {
+          throw new Error(Y.Lang.sub("Timeout is not accurate. Expected : 200. Actual: {value}", {
+            value : delta
+          }));
+        }
+      }, 300);
+    },
+    "Should wait 200 ms in 'body' section and makes sure that timeout is nearly accurate" : function() {
+      var start,
+        delta;
+
+      DM.add('foo', function() {
+        this.wait(200, false);
+      });
+
+      DM.after('foo', function() {
+        delta = Date.now() - start;
+      });
+
+      start = Date.now();
+
+      DM.go();
+
+      this.wait(function() {
+        Assert.isNotUndefined(delta, 'Delta should not be undefined');
+        if (Math.abs(delta - 200) > 2) {
+          throw new Error(Y.Lang.sub("Timeout is not accurate. Expected : 200. Actual: {value}", {
+            value : delta
+          }));
+        }
+      }, 300);
+    },
+    "Should wait 200 ms in 'after' section and makes sure that timeout is nearly accurate" : function() {
+      var start,
+        delta;
+
+      DM.after('foo', function() {
+        this.wait(200, false);
+      });
+
+      DM.after('foo', function() {
+        delta = Date.now() - start;
+      });
+
+      start = Date.now();
+
+      DM.go();
+
+      this.wait(function() {
+        Assert.isNotUndefined(delta, 'Delta should not be undefined');
+        if (Math.abs(delta - 200) > 2) {
+          throw new Error(Y.Lang.sub("Timeout is not accurate. Expected : 200. Actual: {value}", {
+            value : delta
+          }));
+        }
+      }, 300);
+    },
+    "Should check that `wait` without second parameter will continue the execution" : function() {
+      var test = this;
+
+      DM.add('foo', function() {
+        this.wait(10);
+      });
+
+
+      DM.after('foo', function() {
+        test.resume();
+      });
+
+      DM.go();
+
+      this.wait(100);
+    }
+  }));
+
   //todo - test that wait isn't stop other process (other modules or elements)
   //todo - test concurrent modules execution
   //todo - test next
