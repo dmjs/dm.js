@@ -1,5 +1,5 @@
 /*
- * DOM Markers 0.2.4
+ * DOM Markers 0.3.0
  * Copyright 2013 Eugene Poltorakov
  * Licensed under the MIT License: http://www.opensource.org/licenses/mit-license.php
  */
@@ -57,8 +57,8 @@ DMUtils = {
    * @param {HTMLElement} node
    * @return {Array.<{name:String,args:Array}>}
    */
-  getModules : function(node) {
-    return DMUtils.map(node.getAttribute('data-marker').match(/([a-z\-]+(\[[^[]+\])?)/ig) || [], function(str) {
+  getModules : function(node, attrName) {
+    return DMUtils.map(node.getAttribute(attrName).match(/([a-z\-]+(\[[^[]+\])?)/ig) || [], function(str) {
       var parts = str.match(/[^\[\]]+/ig),
         name,
         args;
@@ -133,12 +133,12 @@ DMUtils = {
 };
 
 /**
- *
+ * @param {string} name
  * @param {Function?} callback
  * @param {*?} context
  * @constructor
  */
-function DMModule(callback, context) {
+function DMModule(name, callback, context) {
   this.uuid = DMUtils.uuid();
 
   this._before = [];
@@ -147,6 +147,7 @@ function DMModule(callback, context) {
     callback : callback,
     context  : context
   };
+  this.name = name;
   this.ready = false;
 }
 
@@ -365,6 +366,35 @@ DMExec.prototype.wait = function(timeout, stop){
 };
 
 /**
+ * @returns {*}
+ */
+DMExec.prototype.children = function() {
+  //todo - should accept role
+  //todo - should cache
+  //todo - cover with tests
+  var attrName,
+    nodes,
+    result = {};
+
+  attrName = 'data-' + this.module.name;
+  nodes = DMUtils.all('[' + attrName + ']', this.node);
+
+  DMUtils.each(Array.prototype.slice.call(nodes), function(node) {
+    DMUtils.each(DMUtils.getModules(node, attrName), function(module) {
+      if (!result[module.name]) {
+        result[module.name] = [];
+      }
+      result[module.name].push({
+        node : node,
+        args : module.args
+      });
+    });
+  }, this);
+
+  return result;
+};
+
+/**
  * Singleton; Main library wrapper;
  *
  * {{add:Function,before:Function,after:Function,go:Function,detach:Function,remove:Function,removeAll:Function}}
@@ -379,8 +409,7 @@ DM = (function(options) {
         //_engine = options.engines.y;
         options.engines.y().use('node-base', 'array-extras', function(Y) {
           DMUtils.all = function(selector, ctx){
-            //todo - add context support
-            return Y.all(selector).getDOMNodes();
+            return (ctx ? Y.one(ctx) : Y).all(selector).getDOMNodes();
           };
 
           DMUtils.map = function(arr, callback, context){
@@ -438,7 +467,7 @@ DM = (function(options) {
    * @returns {DMModule}
    */
   function createModule(name, callback, context) {
-    return _modules[name] = new DMModule(callback, context);
+    return _modules[name] = new DMModule(name, callback, context);
   }
 
   /**
@@ -521,7 +550,7 @@ DM = (function(options) {
         var nodes = DMUtils.all('[data-marker]', options.env.document);
 
         DMUtils.each(Array.prototype.slice.call(nodes), function(node) {
-          var modules = DMUtils.getModules(node);
+          var modules = DMUtils.getModules(node, 'data-marker');
 
           modules = DMUtils.filterModules(node, modules, _modules);
 
@@ -613,7 +642,7 @@ DM = (function(options) {
     }
   };
 })({
-  env     : {
+  env : {
     win      : typeof window !== 'undefined' && window,
     document : typeof document !== 'undefined' && document
   },
