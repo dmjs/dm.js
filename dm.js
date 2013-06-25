@@ -22,6 +22,13 @@ DMUtils = {
       }
     }
   },
+  /**
+   * Map utility function
+   * @param {Array} arr
+   * @param {Function} callback
+   * @param {*?} context
+   * @returns {*}
+   */
   map : function(arr, callback, context) {
     return arr.map(callback, context);
   },
@@ -37,6 +44,11 @@ DMUtils = {
 
     return ctx.querySelectorAll(selector);
   },
+  /**
+   * Trim
+   * @param {string} str
+   * @returns {string}
+   */
   trim : function(str) {
     return str.trim();
   },
@@ -77,9 +89,22 @@ DMUtils = {
       };
     });
   },
+  /**
+   * Filter utility function
+   * @param arr
+   * @param callback
+   * @returns {*}
+   */
   filter : function(arr, callback) {
     return arr.filter(callback);
   },
+  /**
+   * Filter modules (exclude already executed on node)
+   * @param {HTMLElement} node
+   * @param {Array} list
+   * @param {Object} modules
+   * @returns {*}
+   */
   filterModules : function(node, list, modules) {
     return DMUtils.filter(list, function(module) {
       var _data = node._dm || (node._dm = {}),
@@ -96,6 +121,7 @@ DMUtils = {
     });
   },
   /**
+   * Return new unique id
    * @returns {Function}
    */
   uuid : (function() {
@@ -124,12 +150,18 @@ function DMModule(callback, context) {
   this.ready = false;
 }
 
+/**
+ * Sort module
+ * @param {Array} arr
+ * @returns {this}
+ * @private
+ */
 DMModule.prototype._sort = function(arr){
   arr.sort(function(a, b){
     var result;
 
     if (a.weight === b.weight) {
-      result = 0;
+      result = 0;//todo - check that the native sort works correctly when arr.length > 10
     }
     else {
       result = a.weight > b.weight ? 1 : -1;
@@ -139,6 +171,12 @@ DMModule.prototype._sort = function(arr){
   });
   return this;
 };
+
+/**
+ * Preparation method
+ * - Sort the callbacks
+ * @returns {this}
+ */
 DMModule.prototype.prepare = function(){
   this._sort(this._before)._sort(this._after);
   this.ready = true;
@@ -185,6 +223,14 @@ DMModule.prototype.after = function(callback, context, weight){
   return id;
 };
 
+/**
+ * DMExec
+ * Execution constructor; Manage callbacks execution
+ * @param module
+ * @param node
+ * @param args
+ * @constructor
+ */
 function DMExec(module, node, args) {
   this.module = module;
   this.node = node;
@@ -197,6 +243,10 @@ function DMExec(module, node, args) {
   this._timer = null;
 }
 
+/**
+ * Execution states
+ * @type {{INITIAL: number, BEFORE: number, MAIN: number, AFTER: number, FINISHED: number}}
+ */
 DMExec.STATES = {
   INITIAL  : 0,
   BEFORE   : 1,
@@ -205,11 +255,18 @@ DMExec.STATES = {
   FINISHED : 4
 };
 
+/**
+ * Execution types
+ * @type {{NEXT: string, STOP: string}}
+ */
 DMExec.TYPES = {
   NEXT : 'next',
   STOP : 'stop'
 };
 
+/**
+ * Force current execution manager instance to execute next callback
+ */
 DMExec.prototype.next = function(){
   if (this._waiting) {
     this._waiting = false;
@@ -217,7 +274,11 @@ DMExec.prototype.next = function(){
   }
   this._index++;
   this.execute(DMExec.TYPES.NEXT);
+  //todo - should we stop any other code below the next call ?
 };
+/**
+ * Stops current execution
+ */
 DMExec.prototype.stop = function(){
   if (this._waiting) {
     this._waiting = false;
@@ -228,9 +289,9 @@ DMExec.prototype.stop = function(){
   this.execute(DMExec.TYPES.STOP);
 };
 /**
- *
+ * Proceed callback execution
  * @param {String?} type
- * @returns {*}
+ * @returns {DMExec}
  */
 DMExec.prototype.execute = function(type){
   var states = DMExec.STATES,
@@ -287,6 +348,12 @@ DMExec.prototype.execute = function(type){
 
   return this;
 };
+
+/**
+ * Initiate timeout
+ * @param {number?} timeout - wait timeout in ms; default: 5000
+ * @param {boolean?} stop - will abort execution if timeout reached & value is true; default: false
+ */
 DMExec.prototype.wait = function(timeout, stop){
   var self = this;
 
@@ -297,7 +364,11 @@ DMExec.prototype.wait = function(timeout, stop){
   }, timeout || 5000);
 };
 
-
+/**
+ * Singleton; Main library wrapper;
+ *
+ * {{add:Function,before:Function,after:Function,go:Function,detach:Function,remove:Function,removeAll:Function}}
+ */
 DM = (function(options) {
   var _modules = {},
     _engine;
@@ -440,7 +511,12 @@ DM = (function(options) {
 
       return module.after(callback, context, weight);
     },
+    /**
+     * Initiate callbacks execution
+     * @returns {DM}
+     */
     go : function() {
+      //todo - should accept & execute only asked module(s): Array.<string>
       initEngine(function() {
         var nodes = DMUtils.all('[data-marker]', options.env.document);
 
