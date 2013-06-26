@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+<head>
+  <style type="text/css">
+    body {
+      font-size : 12px;
+      font-family: monospace;
+    }
+    ul, li {
+      list-style: none;
+      padding : 0;
+      margin : 0;
+    }
+    .b-tabs {
+      border : 1px solid grey;
+      padding : 2px;
+      width : 400px;
+      margin : 20px auto;
+    }
+    .b-tabs_tabs {
+      clear : both;
+      overflow : hidden;
+    }
+    .b-tabs_tabs li {
+      float : left;
+      padding : 4px;
+      margin : 2px;
+      border : 1px solid grey;
+      cursor : pointer;
+    }
+    .b-tabs_tabs li.active {
+      background : #ededed;
+    }
+    .b-tabs_content {
+      padding : 6px 4px;
+      margin : 2px;
+      border : 1px solid grey;
+    }
+    .b-tabs_content li {
+      display : none;
+    }
+  </style>
+</head>
+<body>
+<div class="b-tabs" data-marker="tabs">
+  <ul class="b-tabs_tabs">
+    <li data-tabs="tab[1, true]">Lorem</li>
+    <li data-tabs="tab[2]">Ipsum</li>
+    <li data-tabs="tab[3]">Dolor</li>
+  </ul>
+  <ul class='b-tabs_content'>
+    <li data-tabs="content[1]">Content of the "Lorem"</li>
+    <li data-tabs="content[2]">Content of the "Ipsum"</li>
+    <li data-tabs="content[3]">Content of the "Dolor"</li>
+  </ul>
+</div>
+
+<div class="b-tabs" data-marker="tabs">
+  <ul class="b-tabs_tabs">
+    <li data-tabs="tab[1, true]">Lorem</li>
+    <li data-tabs="tab[2]">Ipsum</li>
+    <li data-tabs="tab[3]">Dolor</li>
+  </ul>
+  <ul class='b-tabs_content'>
+    <li data-tabs="content[1]">Content of the "Lorem"</li>
+    <li data-tabs="content[2]">Content of the "Ipsum"</li>
+    <li data-tabs="content[3]">Content of the "Dolor"</li>
+  </ul>
+</div>
+<script src="../components/yui3-seed/yui.js"></script>
+<script src="../dm.js"></script>
+<script>
+  DM.add('tabs', function() {
+    var _i, _ii,
+        _click,
+        _current,
+        tabs = {},
+        children = this.children();
+
+    for(_i in children.tab) {
+      _current = children.tab[_i];
+      tabs[_current.args[0]] = {
+        node   : _current.node,
+        active : !!_current.args[1]
+      };
+      _current.node.addEventListener('click', function() {
+        if (!tabs[this.tabId].active) {
+          for(_ii in tabs) {
+            if (_ii !== this.tabId && tabs[_ii].active) {
+              tabs[_ii].active = !1;
+              tabs[_ii].node.className = tabs[_ii].node.className.replace('active', '');
+              tabs[_ii].node.tabContent.style.display = 'none';
+            }
+          }
+          this.tabContent.style.display = 'block';
+          this.className += ' active';
+
+          tabs[this.tabId].active = !0;
+        }
+      });
+
+      if (_current.node.addEventListener) {
+        _current.node.addEventListener('click', _click, false);
+      }
+      else {
+        _current.node.attachEvent('onclick', _click);
+      }
+    }
+
+    for(_i in children.content) {
+      _ii = children.content[_i].args[0];
+      _current = tabs[_ii];
+      _current.node.tabContent = children.content[_i].node;
+      _current.node.tabId = _ii;
+
+      if (!_current.active) {
+        _current.node.tabContent.style.display = 'none';
+      }
+      else {
+        _current.node.className +=' active';
+        _current.node.tabContent.style.display = 'block';
+      }
+    }
+  });
+
+  DM.go();
+</script>
+</body>
+</html>
