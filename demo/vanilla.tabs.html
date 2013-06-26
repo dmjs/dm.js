@@ -15,7 +15,7 @@
       border : 1px solid grey;
       padding : 2px;
       width : 400px;
-      margin : 0 auto;
+      margin : 20px auto;
     }
     .b-tabs_tabs {
       clear : both;
@@ -67,11 +67,12 @@
     <li data-tabs="content[3]">Content of the "Dolor"</li>
   </ul>
 </div>
-
-<script src="../dm.min.js"></script>
+<script src="../components/yui3-seed/yui.js"></script>
+<script src="../dm.js"></script>
 <script>
   DM.add('tabs', function() {
     var _i, _ii,
+        _click,
         _current,
         tabs = {},
         children = this.children();
@@ -87,15 +88,23 @@
           for(_ii in tabs) {
             if (_ii !== this.tabId && tabs[_ii].active) {
               tabs[_ii].active = !1;
-              tabs[_ii].node.classList.remove('active');
+              tabs[_ii].node.className = tabs[_ii].node.className.replace('active', '');
               tabs[_ii].node.tabContent.style.display = 'none';
             }
           }
           this.tabContent.style.display = 'block';
-          this.classList.add('active');
+          this.className += ' active';
+
           tabs[this.tabId].active = !0;
         }
-      }, false);
+      });
+
+      if (_current.node.addEventListener) {
+        _current.node.addEventListener('click', _click, false);
+      }
+      else {
+        _current.node.attachEvent('onclick', _click);
+      }
     }
 
     for(_i in children.content) {
@@ -108,7 +117,7 @@
         _current.node.tabContent.style.display = 'none';
       }
       else {
-        _current.node.classList.add('active');
+        _current.node.className +=' active';
         _current.node.tabContent.style.display = 'block';
       }
     }

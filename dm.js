@@ -34,11 +34,11 @@ DMUtils = {
   },
   /**
    * @param {String} selector
-   * @param {HTMLElement|HTMLDocument|?} ctx
+   * @param {Element|HTMLDocument|?} ctx
    * @returns {NodeList}
    */
   all : function(selector, ctx) {
-    if (!(ctx instanceof HTMLElement || ctx instanceof HTMLDocument)) {
+    if (!(ctx instanceof Element || ctx instanceof HTMLDocument)) {
       ctx = document;
     }
 
@@ -54,7 +54,8 @@ DMUtils = {
   },
   /**
    *
-   * @param {HTMLElement} node
+   * @param {Element} node
+   * @param {string} attrName
    * @return {Array.<{name:String,args:Array}>}
    */
   getModules : function(node, attrName) {
@@ -100,7 +101,7 @@ DMUtils = {
   },
   /**
    * Filter modules (exclude already executed on node)
-   * @param {HTMLElement} node
+   * @param {Element} node
    * @param {Array} list
    * @param {Object} modules
    * @returns {*}
