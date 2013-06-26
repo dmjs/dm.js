@@ -6,7 +6,7 @@ This will allows you do not use CSS selectors to find the elements.
 
 ##Version
 
-Current version is: __*0.2.3*__
+Current version is: __*0.3.0*__
 
 ##Example
 
@@ -164,6 +164,10 @@ Accept two optional arguments:
 * `context` - will have the current execution (one of before/add/after) context
 * `node` - target DOM Element
 * `state` & `index` - internal properties
+* `next` - continue callbacks execution
+* `stop` - abort module execution
+* `children` - return element children
+* `wait` - create timeout
 
 ##Running tests
 
