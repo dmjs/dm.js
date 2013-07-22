@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="components/bootstrap/docs/assets/css/bootstrap.css" />
+</head>
+<body>
+<div class="container" data-marker="checkboxes">
+    <h1>Checkboxes</h1>
+    <hr>
+    <label class="checkbox">
+        <input type="checkbox" data-checkboxes="checkbox"> Lorem
+    </label>
+    <label class="checkbox">
+        <input type="checkbox" data-checkboxes="checkbox"> Ipsum
+    </label>
+    <label class="checkbox">
+        <input type="checkbox" data-checkboxes="checkbox"> Dolor
+    </label>
+    <hr>
+    <div class="buttons">
+        <button class="btn btn-mini" data-checkboxes="button[all]">All</button>
+        <button class="btn btn-mini" data-checkboxes="button[none]">None</button>
+        <button class="btn btn-mini" data-checkboxes="button[invert]">Invert</button>
+    </div>
+</div>
+
+<script src="../dm.js"></script>
+<script>
+    DM.add('checkboxes', function() {
+        var children;
+
+        children = this.children();
+
+        children.button.forEach(function(btn){
+            var cb;
+
+            switch (btn.args[0]) {
+                case 'all':
+                    cb = function(ch) { ch.node.checked = true; };
+                    break;
+                case 'none':
+                    cb = function(ch) { ch.node.checked = false; };
+                    break;
+                case 'invert':
+                    cb = function(ch) { ch.node.checked = !ch.node.checked; };
+                    break;
+            }
+            if (cb) {
+                btn.node.addEventListener('click', function() {
+                    children.checkbox.forEach(cb)
+                }, false);
+            }
+        });
+    });
+
+    DM.go();
+</script>
+</body>
+</html>
