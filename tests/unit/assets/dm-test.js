@@ -1327,4 +1327,4 @@ YUI.add('dm-test', function(Y){
 
     //todo - cover children support
     //todo - cover dependency support
-}, '0.2.4', {requires : ['dm', 'test']});
+}, '0.4.0', {requires : ['dm', 'test']});

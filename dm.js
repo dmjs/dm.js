@@ -1,5 +1,5 @@
 /*
- * DOM Markers 0.3.0
+ * DOM Markers 0.4.0
  * Copyright 2013 Eugene Poltorakov
  * Licensed under the MIT License: http://www.opensource.org/licenses/mit-license.php
  */
@@ -134,6 +134,10 @@ DMUtils = {
 
         data[uuid] = state || result;
 
+        /*if (module.name === 'B') {
+            debugger;
+        }*/
+
         return result !== state;
     },
     shouldProcessNode : function(node, module, modules){
@@ -152,6 +156,45 @@ DMUtils = {
         }
 
         return result;
+    },
+/*    isEmpty : function(object) {
+        var i;//todo - probably should use some other way here
+        for(i in object) {
+            if (object.hasOwnProperty(i)) {
+                return false;
+            }
+        }
+        return true;
+    },*/
+    keysCount : function(object) {
+        var i;//todo - probably should use some other way here
+        for(i in object) {
+            if (object.hasOwnProperty(i)) {
+                i++;
+            }
+        }
+        return i;
+    },
+    /**
+     * InSort sorting implementation
+     * @note Used cause of unstable native algorithm of Chrome
+     * @param {Function?} fn
+     * @returns {Array}
+     */
+    inSort : function inSort(fn) {
+        var i, n, j, key;
+        for (i = 1, n = this.length; i < n; i++) {
+            key = this[i]
+            j = i - 1;
+
+            while (j >= 0 && fn ? fn(this[j], key) > 0 : this[j] > key) {
+                this[j + 1] = this[j]
+                j = j - 1
+            }
+
+            this[j + 1] = key
+        }
+        return this;
     },
     /**
      * Return new unique id
@@ -174,7 +217,7 @@ DMUtils = {
 function DMModule(name, callback, context, dependency){
     this.uuid = DMUtils.uuid();
 
-    this._dependency = {};
+    this._dependency = [];
     this._before = [];
     this._after = [];
     this._instances = [];
@@ -182,15 +225,15 @@ function DMModule(name, callback, context, dependency){
         callback : callback,
         context  : context
     };
-    this._inited = false;
     this.name = name;
     this.ready = false;
 
     DMUtils.each(dependency, function(name) {
-        this._dependency[name] = {
+        this._dependency.push({
+            name      : name,
             context   : null,
             instances : []
-        };
+        });
     }, this);
 }
 
@@ -273,9 +316,10 @@ DMModule.prototype.after = function(callback, context, weight){
  * @param module
  * @param node
  * @param args
+ * @param finish
  * @constructor
  */
-function DMExec(module, node, args){
+function DMExec(module, node, args, finish){
     this.module = module;
     this.node = node;
     this.args = args;
@@ -284,6 +328,7 @@ function DMExec(module, node, args){
     this._index = 0;
     this.context = null;
     this._waiting = null;
+    this._finish = finish;
     this._timer = null;
 }
 
@@ -382,6 +427,10 @@ DMExec.prototype.execute = function(type){
             this._state = states.INITIAL;
             this._index = 0;
             this.context = null;
+
+            if (typeof this._finish === 'function') {
+                this._finish.call(this);
+            }
             break;
         default:
     }
@@ -438,7 +487,16 @@ DMExec.prototype.children = function(){
 };
 
 DMExec.prototype.dependency = function(name){
-    return this.module._dependency[name];
+    var i, l, dependencies;
+
+    dependencies = this.module._dependency;
+
+
+    for(i = 0, l = dependencies.length; i < l; i++) {
+        if (dependencies[i].name === name ) {
+            return dependencies[i];
+        }
+    }
 };
 
 /**
@@ -448,7 +506,8 @@ DMExec.prototype.dependency = function(name){
  */
 DM = (function(options){
     var _modules = {},
-        _engine;
+        _engine,
+        _bind = {};
 
     function initEngine(callback){
         if (!_engine) {
@@ -530,35 +589,29 @@ DM = (function(options){
         return module instanceof DMModule ? module : false;
     }
 
-    /**
-     * @param {DMModule} module
-     */
-    function initModule(module, ctx) {
+    function onFinish(deps, listener) {
+        DMUtils.each(deps, function(dep) {
+            if (!_bind[dep.name]) {
+                _bind[dep.name] = {}
+            }
+            _bind[dep.name][listener.name] = listener;
+        });
+    }
 
-        if (!module._inited) {
-            DMUtils.each(module._dependency, function(data, name) {
-                initModule(getModule(name), data);
-            });
+    function executeModule(module, ctx, cb) {
+        DMUtils.each(module._instances, function(inst) {
+            if (DMUtils.updateNodeState(inst.node, module, _modules, 2)) {
 
-            DMUtils.each(module._instances, function(inst) {
-                if (DMUtils.updateNodeState(inst.node, module, _modules, 2)) {
-                    (new DMExec(module, inst.node, inst.data.args)).execute();
+                //update dependencies
+                DMUtils.each(module._dependency, function(dep){
+                    var mod = getModule(dep.name);
+                    dep.context = mod._add.context;
+                    dep.instances = mod._instances;
+                });
 
-                    if (ctx) {
-                        ctx.instances.push({
-                            node : inst.node,
-                            args : inst.data.args
-                        });
-                    }
-                }
-            });
-
-            module._inited = true;
-        }
-
-        if (ctx) {
-            ctx.context = module._add.context;
-        }
+                (new DMExec(module, inst.node, inst.data.args, cb)).execute();
+            }
+        });
     }
 
     return {
@@ -644,30 +697,38 @@ DM = (function(options){
                     });
                 });
 
-                var _ma = [];
+                var executed = [];
 
-                DMUtils.each(_modules, function(module) {
-                    _ma.push(module);
-                });
+                var finishCallback = function() {
+                    executed.push(this.module.name);
 
-                _ma.sort(function(a, b){
-                    var result = 0;
+                    if (_bind[this.module.name]) {
+                        DMUtils.each(_bind[this.module.name], function(module, name){
+                            var ec = 0, i, l, dep;
 
-                    if (a._dependency[b.name]) {
-                        result = -1;
-                    } else if (b._dependency[a.name]) {
-                        result = 1;
+                            DMUtils.each(module._dependency, function(dep){
+                                if (~executed.indexOf(dep.name)) {
+                                    ec++;
+                                }
+                            });
+
+                            if (module._dependency.length === ec) {
+                                executeModule(module, {}, finishCallback);
+                            }
+
+                            _bind[this.module.name] = null;
+                            delete _bind[this.module.name];
+                        }, this);
                     }
-                    return result;
-                });
+                };
 
-                DMUtils.each(_ma, function(module) {
-                    initModule(module);
-                });
-
-                //cleanup modules inited state
                 DMUtils.each(_modules, function(module) {
-                    module._inited = false
+                    if (module._dependency.length === 0) {
+                        executeModule(module, {}, finishCallback);
+                    }
+                    else {
+                        onFinish(module._dependency, module);
+                    }
                 });
             });
             return this;
