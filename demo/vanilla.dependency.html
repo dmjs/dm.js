@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="components/bootstrap/docs/assets/css/bootstrap.css" />
+</head>
+<body>
+<div class="container">
+    <h1>Dependency</h1>
+    <form action="" data-marker="form">
+        <label class="checkbox">
+            <input type="checkbox" data-marker="checkbox[1]" /> One
+        </label>
+        <label class="checkbox">
+            <input type="checkbox" data-marker="checkbox[2]" /> Two
+        </label>
+        <span></span>
+    </form>
+    <h2 data-marker="color[red]">Color</h2>
+</div>
+<script src="../dm.js"></script>
+<script>
+
+    DM.add('form', function(){
+        //console.log('init form', this);
+        console.log('checkbox', this.dependency('checkbox'));
+        console.log('color', this.dependency('color'));
+    }, null, ['checkbox', 'color']);
+
+    DM.add('checkbox', function(){
+        //console.log('init checkbox', this.node);
+        
+    }, {a:2});
+
+    DM.add('color', function(color) {
+        //console.log('init test module');
+        this.node.style.color = color;
+    });
+
+    DM.go();
+
+    /*document.querySelector('.container form span').innerHTML = '<label class="checkbox">'
+        + '<input type="checkbox" data-marker="checkbox[3]" /> Three'
+        + '</label>';
+
+    console.log('---------------------');
+
+    DM.go();*/
+</script>
+</body>
+</html>
