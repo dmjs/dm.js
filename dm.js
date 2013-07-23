@@ -487,8 +487,16 @@ DMExec.prototype.children = function(){
 };
 
 DMExec.prototype.dependency = function(name){
-    //return this.module._dependency[name];
-    throw new Error('omg!!!');
+    var i, l, dependencies;
+
+    dependencies = this.module._dependency;
+
+
+    for(i = 0, l = dependencies.length; i < l; i++) {
+        if (dependencies[i].name === name ) {
+            return dependencies[i];
+        }
+    }
 };
 
 /**
@@ -592,16 +600,17 @@ DM = (function(options){
 
     function executeModule(module, ctx, cb) {
         DMUtils.each(module._instances, function(inst) {
-            //if (DMUtils.updateNodeState(inst.node, module, _modules, 2)) {
-                (new DMExec(module, inst.node, inst.data.args, cb)).execute();
+            if (DMUtils.updateNodeState(inst.node, module, _modules, 2)) {
 
-                if (ctx) {
-                    /*ctx.instances.push({
-                        node : inst.node,
-                        args : inst.data.args
-                    });*/
-                }
-            //}
+                //update dependencies
+                DMUtils.each(module._dependency, function(dep){
+                    var mod = getModule(dep.name);
+                    dep.context = mod._add.context;
+                    dep.instances = mod._instances;
+                });
+
+                (new DMExec(module, inst.node, inst.data.args, cb)).execute();
+            }
         });
     }
 
@@ -695,7 +704,7 @@ DM = (function(options){
 
                     if (_bind[this.module.name]) {
                         DMUtils.each(_bind[this.module.name], function(module, name){
-                            var ec = 0;
+                            var ec = 0, i, l, dep;
 
                             DMUtils.each(module._dependency, function(dep){
                                 if (~executed.indexOf(dep.name)) {
@@ -706,7 +715,10 @@ DM = (function(options){
                             if (module._dependency.length === ec) {
                                 executeModule(module, {}, finishCallback);
                             }
-                        });
+
+                            _bind[this.module.name] = null;
+                            delete _bind[this.module.name];
+                        }, this);
                     }
                 };
 

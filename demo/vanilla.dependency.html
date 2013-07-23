@@ -22,11 +22,11 @@
 <h2 data-marker="A">A</h2>
 <h2 data-marker="B">B</h2>
 <h2 data-marker="C">C</h2>
-<h2 data-marker="D">D</h2>
+<!--<h2 data-marker="D">D</h2>
 <h2 data-marker="E">E</h2>
 <h2 data-marker="F">F</h2>
 <h2 data-marker="G">G</h2>
-<h2 data-marker="H">H</h2>
+<h2 data-marker="H">H</h2>-->
 <script src="../dm.js"></script>
 <script>
     /*var t = Date.now();
@@ -51,10 +51,20 @@
         console.log('A after', Date.now() - t);
     });*/
 
-    /*DM.add('A', function() {}, null, ['B', 'C']);
-    DM.add('B', function() {}, null, []);
-    DM.add('C', function() {}, null, []);*/
     DM.add('A', function() {
+        console.log('A');
+    }, null, ['B', 'C']);
+
+    DM.add('B', function() {
+        console.log('B');
+    }, null, []);
+
+    DM.add('C', function() {
+        console.log('C');
+        this.wait(1000);
+    }, null, []);
+
+    /*DM.add('A', function() {
         console.log('BD : A');
         this.wait(1000);
     }, null, ['B', 'C']);
@@ -92,7 +102,7 @@
     DM.add('H', function() {
         console.log('BD : H');
         this.wait(1000);
-    }, null, ['B']);
+    }, null, ['B']);*/
 
 
     /*DM.add('form', function(){
