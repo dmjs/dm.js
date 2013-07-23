@@ -27,12 +27,12 @@ YUI.add('dm-test', function(Y){
                 this.node.style.color = value;
             });
 
-            DM.add('small', function(){
-                this.node.style.fontSize = '10px';
-            });
-
             DM.add('big', function(){
                 this.node.style.fontSize = '24px';
+            });
+
+            DM.add('small', function(){
+                this.node.style.fontSize = '10px';
             });
 
             DM.go();
@@ -58,13 +58,21 @@ YUI.add('dm-test', function(Y){
             Assert.areSame('24px', this.nodes.b.getStyle('fontSize'));
         },
 
-        "Should verify execution order small > big > big" : function(){
-            Assert.areSame('24px', this.nodes.c.getStyle('fontSize'));
-        },
-
-        "Should verify execution order big > small > small" : function(){
+        /**
+         * There aren't any dependencies between the small & big modules
+         * Execution order depends only on dependencies & modules declaration queue
+         */
+        "Should verify execution order big > small" : function() {
+            Assert.areSame('10px', this.nodes.c.getStyle('fontSize'));
             Assert.areSame('10px', this.nodes.d.getStyle('fontSize'));
         }
+        /*"Should verify execution order small > big > big" : function(){
+            Assert.areSame('24px', this.nodes.c.getStyle('fontSize'));
+        },*/
+
+        /*"Should verify execution order big > small > small" : function(){
+            Assert.areSame('10px', this.nodes.d.getStyle('fontSize'));
+        }*/
     }));
 
     Y.Test.Runner.add(new Y.Test.Case({
@@ -403,7 +411,7 @@ YUI.add('dm-test', function(Y){
             Assert.areSame('Hello Mr. Foo! :) ', this.nodes.a.getHTML(), '#node-a content should be valid');
             Assert.areSame('Good bye Mrs. Bar ! =) ', this.nodes.b.getHTML(), '#node-b content should be valid');
             Assert.areSame('Hello Mr. Foo! :) Good bye Mrs. Bar ! =) ', this.nodes.c.getHTML(), '#node-c content should be valid');
-            Assert.areSame('Good bye Mrs. Bar ! =) Hello Mr. Foo! :) ', this.nodes.d.getHTML(), '#node-d content should be valid');
+            Assert.areSame('Hello Mr. Foo! :) Good bye Mrs. Bar ! =) ', this.nodes.d.getHTML(), '#node-d content should be valid');
             Assert.areSame('Hello Mr. Foo! :) ', this.nodes.e.getHTML(), '#node-e content should be valid');
         },
 
@@ -413,7 +421,7 @@ YUI.add('dm-test', function(Y){
             Assert.areSame('Hello Mr. Foo! :) ', this.nodes.a.getHTML(), '#node-a content should be valid');
             Assert.areSame('Good bye Mrs. Bar ! =) ', this.nodes.b.getHTML(), '#node-b content should be valid');
             Assert.areSame('Hello Mr. Foo! :) Good bye Mrs. Bar ! =) ', this.nodes.c.getHTML(), '#node-c content should be valid');
-            Assert.areSame('Good bye Mrs. Bar ! =) Hello Mr. Foo! :) ', this.nodes.d.getHTML(), '#node-d content should be valid');
+            Assert.areSame('Hello Mr. Foo! :) Good bye Mrs. Bar ! =) ', this.nodes.d.getHTML(), '#node-d content should be valid');
             Assert.areSame('Hello Mr. Foo! :) ', this.nodes.e.getHTML(), '#node-e content should be valid');
         }
     }));
@@ -1122,21 +1130,21 @@ YUI.add('dm-test', function(Y){
             });
 
             DM.after('foo', function(){
-                delta = Date.now() - start;
+                delta = (new Date).getTime() - start;
             });
 
-            start = Date.now();
+            start = (new Date).getTime();
 
             DM.go();
 
             this.wait(function(){
                 Assert.isNotUndefined(delta, 'Delta should not be undefined');
-                if (Math.abs(delta - 200) > 2) {
+                if (Math.abs(delta - 200) > 20) {
                     throw new Error(Y.Lang.sub("Timeout is not accurate. Expected : 200. Actual: {value}", {
                         value : delta
                     }));
                 }
-            }, 300);
+            }, 400);
         },
 
         "Should wait 200 ms in 'body' section and makes sure that timeout is nearly accurate" : function(){
@@ -1148,16 +1156,16 @@ YUI.add('dm-test', function(Y){
             });
 
             DM.after('foo', function(){
-                delta = Date.now() - start;
+                delta = (new Date).getTime() - start;
             });
 
-            start = Date.now();
+            start = (new Date).getTime();
 
             DM.go();
 
             this.wait(function(){
                 Assert.isNotUndefined(delta, 'Delta should not be undefined');
-                if (Math.abs(delta - 200) > 2) {
+                if (Math.abs(delta - 200) > 20) {
                     throw new Error(Y.Lang.sub("Timeout is not accurate. Expected : 200. Actual: {value}", {
                         value : delta
                     }));
@@ -1174,16 +1182,16 @@ YUI.add('dm-test', function(Y){
             });
 
             DM.after('foo', function(){
-                delta = Date.now() - start;
+                delta = (new Date).getTime() - start;
             });
 
-            start = Date.now();
+            start = (new Date).getTime();
 
             DM.go();
 
             this.wait(function(){
                 Assert.isNotUndefined(delta, 'Delta should not be undefined');
-                if (Math.abs(delta - 200) > 2) {
+                if (Math.abs(delta - 200) > 20) {
                     throw new Error(Y.Lang.sub("Timeout is not accurate. Expected : 200. Actual: {value}", {
                         value : delta
                     }));
@@ -1327,4 +1335,4 @@ YUI.add('dm-test', function(Y){
 
     //todo - cover children support
     //todo - cover dependency support
-}, '0.4.0', {requires : ['dm', 'test']});
+}, '0.4.1', {requires : ['dm', 'test']});
