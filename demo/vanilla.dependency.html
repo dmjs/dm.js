@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="components/bootstrap/docs/assets/css/bootstrap.css" />
+</head>
+<body>
+<!--<div class="container">
+    <h1>Dependency</h1>
+    <form action="" data-marker="form">
+        <label class="checkbox">
+            <input type="checkbox" data-marker="checkbox[1]" /> One
+        </label>
+        <label class="checkbox">
+            <input type="checkbox" data-marker="checkbox[2]" /> Two
+        </label>
+        <span></span>
+    </form>
+    <h2 data-marker="color[red]">Color</h2>
+</div>-->
+<h2 data-marker="A">A</h2>
+<h2 data-marker="B">B</h2>
+<h2 data-marker="C">C</h2>
+<!--<h2 data-marker="D">D</h2>
+<h2 data-marker="E">E</h2>
+<h2 data-marker="F">F</h2>
+<h2 data-marker="G">G</h2>
+<h2 data-marker="H">H</h2>-->
+<script src="../dm.min.js"></script>
+<script>
+    /*var t = Date.now();
+
+    DM.add('B', function() {
+        this.wait(1000);
+        console.log('B add', Date.now() - t);
+    }, null, ['A'])
+
+    DM.add('A', function() {
+        this.wait(1000);
+        console.log('A add', Date.now() - t);
+    });*/
+
+    /*DM.before('A', function() {
+        //this.wait(1000);
+        console.log('A before', Date.now() - t);
+    });*/
+
+    /*DM.after('A', function() {
+        //this.wait(1000);
+        console.log('A after', Date.now() - t);
+    });*/
+
+    DM.add('A', function() {
+        console.log('A');
+    }, null, ['B', 'C']);
+
+    DM.add('B', function() {
+        console.log('B');
+    }, null, []);
+
+    DM.add('C', function() {
+        console.log('C');
+        this.wait(1000);
+    }, null, []);
+
+    /*DM.add('A', function() {
+        console.log('BD : A');
+        this.wait(1000);
+    }, null, ['B', 'C']);
+
+    DM.add('B', function() {
+        console.log('BD : B');
+        this.wait(1000);
+    });
+
+    DM.add('C', function() {
+        console.log('BD : C');
+        this.wait(1000);
+    }, null, ['D']);
+
+    DM.add('D', function() {
+        console.log('BD : D');
+        this.wait(1000);
+    });
+
+    DM.add('E', function() {
+        console.log('BD : E');
+        this.wait(1000);
+    });
+
+    DM.add('F', function() {
+        console.log('BD : F');
+        this.wait(1000);
+    }, null, ['A']);
+
+    DM.add('G', function() {
+        console.log('BD : G');
+        this.wait(1000);
+    }, null, ['B', 'D']);
+
+    DM.add('H', function() {
+        console.log('BD : H');
+        this.wait(1000);
+    }, null, ['B']);*/
+
+
+    /*DM.add('form', function(){
+        //console.log('init form', this);
+        console.log('checkbox', this.dependency('checkbox'));
+        console.log('color', this.dependency('color'));
+    }, null, ['checkbox', 'color']);
+
+    DM.add('checkbox', function(){
+    }, {a:2});
+
+    DM.add('color', function(color) {
+        var self = this;
+
+        this.wait();
+
+        setTimeout(function() {
+            self.node.style.color = color;
+            self.next();
+        }, 1000);
+    });*/
+
+    DM.go();
+
+    /*document.querySelector('.container form span').innerHTML = '<label class="checkbox">'
+        + '<input type="checkbox" data-marker="checkbox[3]" /> Three'
+        + '</label>';
+
+    console.log('---------------------');
+
+    DM.go();*/
+</script>
+</body>
+</html>
