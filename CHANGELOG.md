@@ -1,5 +1,8 @@
 #Changelog
 
+## 0.4.1 (Jul 23 2013)
+* fix : tests for IE 7, IE10
+
 ## 0.4.0 (Jul 23 2013)
 * added : dependecies support for add method
 

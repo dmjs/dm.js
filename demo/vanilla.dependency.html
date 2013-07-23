@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <title></title>
     <link rel="stylesheet" href="components/bootstrap/docs/assets/css/bootstrap.css" />
+    <style type="text/css">
+        h2 {
+            font-size : 50px;
+        }
+    </style>
 </head>
 <body>
 <!--<div class="container">
@@ -53,15 +58,24 @@
 
     DM.add('A', function() {
         console.log('A');
+        this.wait(1000);
+        this.node.style.color = 'red';
     }, null, ['B', 'C']);
 
     DM.add('B', function() {
         console.log('B');
+        this.wait(1000);
+        this.node.style.color = 'blue';
     }, null, []);
+
+    DM.after('B', function() {
+        this.node.style.color = 'yellow';
+    });
 
     DM.add('C', function() {
         console.log('C');
-        this.wait(1000);
+        this.wait(1500);
+        this.node.style.color = 'green';
     }, null, []);
 
     /*DM.add('A', function() {
