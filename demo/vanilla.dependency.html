@@ -56,42 +56,42 @@
     DM.add('C', function() {}, null, []);*/
     DM.add('A', function() {
         console.log('BD : A');
-        this.wait(100);
+        this.wait(1000);
     }, null, ['B', 'C']);
 
     DM.add('B', function() {
         console.log('BD : B');
-        this.wait(200);
+        this.wait(1000);
     });
 
     DM.add('C', function() {
         console.log('BD : C');
-        this.wait(300);
+        this.wait(1000);
     }, null, ['D']);
 
     DM.add('D', function() {
         console.log('BD : D');
-        this.wait(400);
+        this.wait(1000);
     });
 
     DM.add('E', function() {
         console.log('BD : E');
-        this.wait(500);
+        this.wait(1000);
     });
 
     DM.add('F', function() {
         console.log('BD : F');
-        this.wait(600);
+        this.wait(1000);
     }, null, ['A']);
 
     DM.add('G', function() {
         console.log('BD : G');
-        this.wait(700);
+        this.wait(1000);
     }, null, ['B', 'D']);
 
     DM.add('H', function() {
         console.log('BD : H');
-        this.wait(800);
+        this.wait(1000);
     }, null, ['B']);
 
 

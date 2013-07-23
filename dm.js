@@ -428,10 +428,8 @@ DMExec.prototype.execute = function(type){
             this._index = 0;
             this.context = null;
 
-            console.log('FINISH', this.module.name);
-
             if (typeof this._finish === 'function') {
-                this._finish();
+                this._finish.call(this);
             }
             break;
         default:
@@ -500,7 +498,8 @@ DMExec.prototype.dependency = function(name){
  */
 DM = (function(options){
     var _modules = {},
-        _engine;
+        _engine,
+        _bind = {};
 
     function initEngine(callback){
         if (!_engine) {
@@ -582,42 +581,13 @@ DM = (function(options){
         return module instanceof DMModule ? module : false;
     }
 
-    function validateDep(module, deps, cb, executed) {
-        var dep, i;
-
-        if (deps.length === 0) {
-            if (!~executed.indexOf(module.name)) {
-                executed.push(module.name);
-                cb(module);
+    function onFinish(deps, listener) {
+        DMUtils.each(deps, function(dep) {
+            if (!_bind[dep.name]) {
+                _bind[dep.name] = {}
             }
-        }
-        else {
-            i = 0;
-
-            while(i < deps.length) {
-                if (!~executed.indexOf(deps[i].name)) {
-                    dep = deps[i];
-                    break;
-                }
-                i++;
-            }
-
-            if (dep) {
-                dep = getModule(dep.name);
-
-                validateDep(dep, dep._dependency, function(mod) {
-                    cb(mod, function(){
-                        validateDep(module, deps, function(mod){
-                            cb(mod);
-                        }, executed);
-                    });
-                }, executed);
-            } else {
-                validateDep(module, deps.slice(1), function(mod) {
-                    cb(mod);
-                }, executed);
-            }
-        }
+            _bind[dep.name][listener.name] = listener;
+        });
     }
 
     function executeModule(module, ctx, cb) {
@@ -720,10 +690,33 @@ DM = (function(options){
 
                 var executed = [];
 
+                var finishCallback = function() {
+                    executed.push(this.module.name);
+
+                    if (_bind[this.module.name]) {
+                        DMUtils.each(_bind[this.module.name], function(module, name){
+                            var ec = 0;
+
+                            DMUtils.each(module._dependency, function(dep){
+                                if (~executed.indexOf(dep.name)) {
+                                    ec++;
+                                }
+                            });
+
+                            if (module._dependency.length === ec) {
+                                executeModule(module, {}, finishCallback);
+                            }
+                        });
+                    }
+                };
+
                 DMUtils.each(_modules, function(module) {
-                    validateDep(module, module._dependency, function(mod, cb) {
-                        executeModule(mod, {}, cb);
-                    }, executed);
+                    if (module._dependency.length === 0) {
+                        executeModule(module, {}, finishCallback);
+                    }
+                    else {
+                        onFinish(module._dependency, module);
+                    }
                 });
             });
             return this;
