@@ -1,5 +1,5 @@
 /*
- * DOM Markers 0.3.0
+ * DOM Markers 0.4.0
  * Copyright 2013 Eugene Poltorakov
  * Licensed under the MIT License: http://www.opensource.org/licenses/mit-license.php
  */

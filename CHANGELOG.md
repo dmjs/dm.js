@@ -1,5 +1,8 @@
 #Changelog
 
+## 0.4.0 (Jul 23 2013)
+* added : dependecies support for add method
+
 ## 0.3.0 (Jun 26 2013)
 * added : basic DMExec.children() support
 * added : demo/vanilla.tabs.html example
