@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel="stylesheet" href="components/bootstrap/docs/assets/css/bootstrap.css" />
+    <style type="text/css">
+        form[data-marker=form-custom] {
+        }
+
+        div[data-form-custom^=section] {
+            display  : none;
+            height   : 300px;
+            position : relative;
+            outline  : none;
+        }
+
+        div[data-form-custom^=section] fieldset {
+            overflow : hidden;
+        }
+
+        div[data-form-custom^=section] .buttons {
+            position   : absolute;
+            bottom     : 10px;
+            left       : 10px;
+            border-top : 1px solid #e5e5e5;
+            width      : 100%;
+            padding    : 10px 0;
+        }
+
+        .text-error, .error {
+            font-weight : bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <form class="form-horizontal" action="" data-marker="form-custom">
+        <h1>Form name</h1>
+
+        <div data-form-custom="section[first]">
+            <fieldset>
+                <legend>Step 1</legend>
+
+                <div class="control-group" data-form-custom="group[first-name]">
+                    <label class="control-label">First Name</label>
+
+                    <div class="controls">
+                        <input type="text" data-form-custom="input[first-name,first,required]">
+                    </div>
+                </div>
+                <div class="control-group" data-form-custom="group[last-name]">
+                    <label class="control-label">Last Name</label>
+
+                    <div class="controls">
+                        <input type="text" data-form-custom="input[last-name,first,required]">
+                    </div>
+                </div>
+
+                <div class="buttons">
+                    <button class="btn" data-form-custom="go[second]">Next</button>
+                </div>
+            </fieldset>
+        </div>
+        <div data-form-custom="section[second]">
+            <fieldset>
+                <legend>Step 2</legend>
+
+                <div class="control-group" data-form-custom="group[email]">
+                    <label class="control-label">Email</label>
+
+                    <div class="controls">
+                        <input type="text" data-form-custom="input[email,second,required]">
+                    </div>
+                </div>
+                <div class="control-group" data-form-custom="group[address]">
+                    <label class="control-label">Address</label>
+
+                    <div class="controls">
+                        <input type="text" data-form-custom="input[address,second,required]">
+                    </div>
+                </div>
+
+                <div class="buttons">
+                    <button class="btn" data-form-custom="go[first]">Prev</button>
+                    <button class="btn" data-form-custom="go[third]">Next</button>
+                </div>
+            </fieldset>
+        </div>
+        <div data-form-custom="section[third]">
+            <fieldset>
+                <legend>Step 3</legend>
+
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante. At vero eos et
+                    accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est
+                    Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
+                    eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.</p>
+
+                <label class="checkbox inline" data-form-custom="group[check, inline]">
+                    <input type="checkbox" data-form-custom="input[check,third,required]"> Ipsum lorem sit
+                </label>
+
+                <div class="buttons">
+                    <button class="btn" data-form-custom="go[second]">Prev</button>
+                    <button type="submit" class="btn btn-info" data-form-custom="submit">Submit</button>
+                </div>
+            </fieldset>
+        </div>
+
+    </form>
+</div>
+<script src="../dm.min.js"></script>
+<script>
+    DM.add('form-custom', function(){
+        var current = 'first',
+            sections = {},
+            inputs = {},
+            children = this.children();
+
+        //collect section information
+        children.section.forEach(function(section, index){
+            sections[section.args[0]] = {
+                required : [],
+                index    : index,
+                node     : section.node
+            };
+        });
+
+        //save sections form elements
+        children.input.forEach(function(input){
+            inputs[input.args[0]] = input;
+            if (input.args[2] === 'required') {
+                sections[input.args[1]].required.push(input);
+            }
+        });
+
+        //create relationships
+        children.group.forEach(function(group){
+            inputs[group.args[0]].group = group;
+        });
+
+        //bind n/p buttons
+        children.go.forEach(function(btn){
+            btn.node.addEventListener('click', function(e){
+                var fwd = sections[btn.args[0]].index > sections[current].index;
+
+                if (fwd) {
+                    if (validateInputs(sections[current].required)) {
+                        updateSection(btn.args[0]);
+                    }
+                } else {
+                    updateSection(btn.args[0]);
+                }
+
+                e.preventDefault();
+            }, false);
+        });
+
+        //bind submit handler
+        this.node.addEventListener('submit', function(e){
+            if (validateInputs(children.input)) {
+                alert('Ok');
+            }
+            e.preventDefault();
+        });
+
+        updateSection();
+
+        function validateInputs(validate){
+            var result = true;
+
+            //clear error messages
+            children.input.forEach(function(input) {
+                var groupCL = inputs[input.args[0]].group.node.classList;
+
+                groupCL.remove('error');
+                groupCL.remove('text-error');
+            });
+
+            validate.forEach(function(input) {
+                var group = inputs[input.args[0]].group;
+
+                if (input.args[2] === 'required' && input.node.type === 'checkbox' ? !input.node.checked : !input.node.value) {
+                    group.node.classList.add(
+                        group.args[1] === 'inline' ? 'text-error' : 'error'
+                    );
+
+                    result = false;
+                }
+            });
+            return result;
+        }
+
+        function updateSection(update){
+            if (update && update !== current) {
+                sections[current].node.style.display = 'none';
+                current = update;
+            }
+            sections[current].node.style.display = 'block';
+        }
+    });
+
+    DM.go()
+</script>
+</body>
+</html>
