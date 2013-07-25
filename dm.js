@@ -184,12 +184,12 @@ DMUtils = {
     inSort : function inSort(fn) {
         var i, n, j, key;
         for (i = 1, n = this.length; i < n; i++) {
-            key = this[i]
+            key = this[i];
             j = i - 1;
 
             while (j >= 0 && fn ? fn(this[j], key) > 0 : this[j] > key) {
-                this[j + 1] = this[j]
-                j = j - 1
+                this[j + 1] = this[j];
+                j = j - 1;
             }
 
             this[j + 1] = key
@@ -212,6 +212,7 @@ DMUtils = {
  * @param {string} name
  * @param {Function?} callback
  * @param {*?} context
+ * @param {Array.<string>?} dependency
  * @constructor
  */
 function DMModule(name, callback, context, dependency){
@@ -487,16 +488,17 @@ DMExec.prototype.children = function(){
 };
 
 DMExec.prototype.dependency = function(name){
-    var i, l, dependencies;
+    var i, l, dependencies, result;
 
     dependencies = this.module._dependency;
 
-
     for(i = 0, l = dependencies.length; i < l; i++) {
         if (dependencies[i].name === name ) {
-            return dependencies[i];
+            result = dependencies[i];
+            break;
         }
     }
+    return result;
 };
 
 /**
@@ -546,6 +548,7 @@ DM = (function(options){
                 };
 
                 DMUtils.map = function(arr, callback, context){
+                    //todo - use context
                     return _engine.map(arr, callback);
                 };
 
@@ -574,6 +577,7 @@ DM = (function(options){
      * @param {string} name
      * @param {Function?} callback
      * @param {Object?} context
+     * @param {Array.<string>?} dependency
      * @returns {DMModule}
      */
     function createModule(name, callback, context, dependency){
@@ -586,15 +590,15 @@ DM = (function(options){
      * @returns {DMModule|Boolean}
      */
     function getModule(name){
-        var module = _modules[name]
+        var module = _modules[name];
 
         //todo - thrown an error if module was not found
 
         return module instanceof DMModule ? module : false;
     }
 
-    function onFinish(deps, listener) {
-        DMUtils.each(deps, function(dep) {
+    function onFinish(dependancies, listener) {
+        DMUtils.each(dependancies, function(dep) {
             if (!_bind[dep.name]) {
                 _bind[dep.name] = {}
             }
@@ -602,7 +606,7 @@ DM = (function(options){
         });
     }
 
-    function executeModule(module, ctx, cb) {
+    function executeModule(module, cb) {
         DMUtils.each(module._instances, function(inst) {
             if (DMUtils.updateNodeState(inst.node, module, _modules, 2)) {
 
@@ -653,6 +657,7 @@ DM = (function(options){
          * @param {String} name
          * @param {Function?} callback
          * @param {*?} context
+         * @param {Array.<string>?} dependency
          * @returns {Number}
          */
         add       : function(name, callback, context, dependency){
@@ -737,8 +742,8 @@ DM = (function(options){
                     executed.push(this.module.name);
 
                     if (_bind[this.module.name]) {
-                        DMUtils.each(_bind[this.module.name], function(module, name){
-                            var ec = 0, i, l, dep;
+                        DMUtils.each(_bind[this.module.name], function(module){
+                            var ec = 0;
 
                             DMUtils.each(module._dependency, function(dep){
                                 if (~executed.indexOf(dep.name)) {
@@ -747,7 +752,7 @@ DM = (function(options){
                             });
 
                             if (module._dependency.length === ec) {
-                                executeModule(module, {}, finishCallback);
+                                executeModule(module, finishCallback);
                             }
 
                             _bind[this.module.name] = null;
@@ -758,7 +763,7 @@ DM = (function(options){
 
                 DMUtils.each(_modules, function(module) {
                     if (module._dependency.length === 0) {
-                        executeModule(module, {}, finishCallback);
+                        executeModule(module, finishCallback);
                     }
                     else {
                         onFinish(module._dependency, module);
