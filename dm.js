@@ -468,7 +468,7 @@ DMExec.prototype.children = function(){
         nodes,
         result = {};
 
-    attrName = 'data-' + this.module.name;
+    attrName = DM.config('prefix') + this.module.name;
     nodes = DMUtils.all('[' + attrName + ']', this.node);
 
     DMUtils.each(Array.prototype.slice.call(nodes), function(node){
@@ -507,7 +507,11 @@ DMExec.prototype.dependency = function(name){
 DM = (function(options){
     var _modules = {},
         _engine,
-        _bind = {};
+        _bind = {},
+        _config = {
+            attr   : 'data-marker',
+            prefix : 'data-'
+        };
 
     function initEngine(callback){
         if (!_engine) {
@@ -617,6 +621,35 @@ DM = (function(options){
     return {
         /**
          *
+         * @param {string|Object} cfg
+         * @param {string?} value
+         * @returns {*}
+         */
+        config : function(cfg, value) {
+            var result, i;
+
+            if (typeof cfg === 'string') {
+                if (cfg in _config) {
+                    if (typeof value === 'string') {
+                        _config[cfg] = value;
+                    }
+                    else {
+                        result = _config[cfg];
+                    }
+                }
+            }
+            else if (typeof cfg === 'object') {
+                for(i in cfg) {
+                    if (cfg.hasOwnProperty(i) &&i in _config && typeof cfg[i] === 'string') {
+                      _config[i] = cfg[i];
+                    }
+                }
+            }
+
+            return result;
+        },
+        /**
+         *
          * @param {String} name
          * @param {Function?} callback
          * @param {*?} context
@@ -680,10 +713,11 @@ DM = (function(options){
         go        : function(){
             //todo - should accept & execute only asked module(s): Array.<string>
             initEngine(function(){
-                var nodes = DMUtils.all('[data-marker]', options.env.document);
+                var ATTR = DM.config('attr'),
+                    nodes = DMUtils.all('[' + ATTR + ']', options.env.document);
 
                 DMUtils.each(Array.prototype.slice.call(nodes), function(node){
-                    var modules = DMUtils.getModules(node, 'data-marker');
+                    var modules = DMUtils.getModules(node, ATTR);
 
                     DMUtils.each(modules, function(data){
                         var module = getModule(data.name);
