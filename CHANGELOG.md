@@ -1,5 +1,8 @@
 #Changelog
 
+## 0.4.2 (Jul 25 2013)
+* add : DM.config method
+
 ## 0.4.1 (Jul 23 2013)
 * fix : tests for IE 7, IE10
 

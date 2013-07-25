@@ -1,5 +1,5 @@
 /*
- * DOM Markers 0.4.1
+ * DOM Markers 0.4.2
  * Copyright 2013 Eugene Poltorakov
  * Licensed under the MIT License: http://www.opensource.org/licenses/mit-license.php
  */
@@ -184,12 +184,12 @@ DMUtils = {
     inSort : function inSort(fn) {
         var i, n, j, key;
         for (i = 1, n = this.length; i < n; i++) {
-            key = this[i]
+            key = this[i];
             j = i - 1;
 
             while (j >= 0 && fn ? fn(this[j], key) > 0 : this[j] > key) {
-                this[j + 1] = this[j]
-                j = j - 1
+                this[j + 1] = this[j];
+                j = j - 1;
             }
 
             this[j + 1] = key
@@ -212,6 +212,7 @@ DMUtils = {
  * @param {string} name
  * @param {Function?} callback
  * @param {*?} context
+ * @param {Array.<string>?} dependency
  * @constructor
  */
 function DMModule(name, callback, context, dependency){
@@ -468,7 +469,7 @@ DMExec.prototype.children = function(){
         nodes,
         result = {};
 
-    attrName = 'data-' + this.module.name;
+    attrName = DM.config('prefix') + this.module.name;
     nodes = DMUtils.all('[' + attrName + ']', this.node);
 
     DMUtils.each(Array.prototype.slice.call(nodes), function(node){
@@ -487,16 +488,17 @@ DMExec.prototype.children = function(){
 };
 
 DMExec.prototype.dependency = function(name){
-    var i, l, dependencies;
+    var i, l, dependencies, result;
 
     dependencies = this.module._dependency;
 
-
     for(i = 0, l = dependencies.length; i < l; i++) {
         if (dependencies[i].name === name ) {
-            return dependencies[i];
+            result = dependencies[i];
+            break;
         }
     }
+    return result;
 };
 
 /**
@@ -507,7 +509,11 @@ DMExec.prototype.dependency = function(name){
 DM = (function(options){
     var _modules = {},
         _engine,
-        _bind = {};
+        _bind = {},
+        _config = {
+            attr   : 'data-marker',
+            prefix : 'data-'
+        };
 
     function initEngine(callback){
         if (!_engine) {
@@ -542,6 +548,7 @@ DM = (function(options){
                 };
 
                 DMUtils.map = function(arr, callback, context){
+                    //todo - use context
                     return _engine.map(arr, callback);
                 };
 
@@ -570,6 +577,7 @@ DM = (function(options){
      * @param {string} name
      * @param {Function?} callback
      * @param {Object?} context
+     * @param {Array.<string>?} dependency
      * @returns {DMModule}
      */
     function createModule(name, callback, context, dependency){
@@ -582,15 +590,15 @@ DM = (function(options){
      * @returns {DMModule|Boolean}
      */
     function getModule(name){
-        var module = _modules[name]
+        var module = _modules[name];
 
         //todo - thrown an error if module was not found
 
         return module instanceof DMModule ? module : false;
     }
 
-    function onFinish(deps, listener) {
-        DMUtils.each(deps, function(dep) {
+    function onFinish(dependancies, listener) {
+        DMUtils.each(dependancies, function(dep) {
             if (!_bind[dep.name]) {
                 _bind[dep.name] = {}
             }
@@ -598,7 +606,7 @@ DM = (function(options){
         });
     }
 
-    function executeModule(module, ctx, cb) {
+    function executeModule(module, cb) {
         DMUtils.each(module._instances, function(inst) {
             if (DMUtils.updateNodeState(inst.node, module, _modules, 2)) {
 
@@ -617,9 +625,39 @@ DM = (function(options){
     return {
         /**
          *
+         * @param {string|Object} cfg
+         * @param {string?} value
+         * @returns {*}
+         */
+        config : function(cfg, value) {
+            var result, i;
+
+            if (typeof cfg === 'string') {
+                if (cfg in _config) {
+                    if (typeof value === 'string') {
+                        _config[cfg] = value;
+                    }
+                    else {
+                        result = _config[cfg];
+                    }
+                }
+            }
+            else if (typeof cfg === 'object') {
+                for(i in cfg) {
+                    if (cfg.hasOwnProperty(i) &&i in _config && typeof cfg[i] === 'string') {
+                      _config[i] = cfg[i];
+                    }
+                }
+            }
+
+            return result;
+        },
+        /**
+         *
          * @param {String} name
          * @param {Function?} callback
          * @param {*?} context
+         * @param {Array.<string>?} dependency
          * @returns {Number}
          */
         add       : function(name, callback, context, dependency){
@@ -680,10 +718,11 @@ DM = (function(options){
         go        : function(){
             //todo - should accept & execute only asked module(s): Array.<string>
             initEngine(function(){
-                var nodes = DMUtils.all('[data-marker]', options.env.document);
+                var ATTR = DM.config('attr'),
+                    nodes = DMUtils.all('[' + ATTR + ']', options.env.document);
 
                 DMUtils.each(Array.prototype.slice.call(nodes), function(node){
-                    var modules = DMUtils.getModules(node, 'data-marker');
+                    var modules = DMUtils.getModules(node, ATTR);
 
                     DMUtils.each(modules, function(data){
                         var module = getModule(data.name);
@@ -703,8 +742,8 @@ DM = (function(options){
                     executed.push(this.module.name);
 
                     if (_bind[this.module.name]) {
-                        DMUtils.each(_bind[this.module.name], function(module, name){
-                            var ec = 0, i, l, dep;
+                        DMUtils.each(_bind[this.module.name], function(module){
+                            var ec = 0;
 
                             DMUtils.each(module._dependency, function(dep){
                                 if (~executed.indexOf(dep.name)) {
@@ -713,7 +752,7 @@ DM = (function(options){
                             });
 
                             if (module._dependency.length === ec) {
-                                executeModule(module, {}, finishCallback);
+                                executeModule(module, finishCallback);
                             }
 
                             _bind[this.module.name] = null;
@@ -724,7 +763,7 @@ DM = (function(options){
 
                 DMUtils.each(_modules, function(module) {
                     if (module._dependency.length === 0) {
-                        executeModule(module, {}, finishCallback);
+                        executeModule(module, finishCallback);
                     }
                     else {
                         onFinish(module._dependency, module);
