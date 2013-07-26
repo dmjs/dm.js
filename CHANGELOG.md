@@ -1,5 +1,8 @@
 #Changelog
 
+## 0.4.3 (Jul 26 2013)
+* changed : repository moved into https://github.com/dmjs/dm.js
+
 ## 0.4.2 (Jul 25 2013)
 * add : DM.config method
 
