@@ -35,7 +35,7 @@ Current version is: __*0.4.2*__
 Three options are available:
 
 * [Download the latest release][release]
-* Clone the repo: `git clone git@github.com:jslayer/dm.js.git`
+* Clone the repo: `git clone git@github.com:dmjs/dm.js.git`
 * Install with [Bower][bower]: `bower install dm`
 
 ##Demos
@@ -198,8 +198,8 @@ The above copyright notice and this permission notice shall be included in all c
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-[demos]:http://jslayer.github.io/dm.js/demo/
+[demos]:http://dmjs.github.io/dm.js/demo/
 [changelog]:CHANGELOG.md
-[release]:https://github.com/jslayer/dm.js/zipball/master
+[release]:https://github.com/dmjs/dm.js/zipball/master
 [bower]:http://bower.io/
 [github-grover]:https://github.com/yui/grover

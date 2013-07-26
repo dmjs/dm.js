@@ -1,5 +1,5 @@
 {
-  "name": "dm",
+  "name": "dm.js",
   "description": "DOM Markers",
   "version": "0.4.2",
   "main": "dm.js",
