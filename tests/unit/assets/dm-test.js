@@ -1337,4 +1337,4 @@ YUI.add('dm-test', function(Y){
     //todo - cover dependency support
     //todo - run the tests with jQuery
     //todo - add tests of DM.config
-}, '0.4.2', {requires : ['dm', 'test']});
+}, '0.4.3', {requires : ['dm', 'test']});
