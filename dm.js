@@ -5,7 +5,7 @@
  */
 
 var DM, DMUtils;
-
+//TODO - outer dependencies support (addDep, removeDep, getDep)
 DMUtils = {
     /**
      * Each utility function
