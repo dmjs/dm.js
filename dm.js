@@ -6,6 +6,7 @@
 
 var DM, DMUtils;
 //TODO - outer dependencies support (addDep, removeDep, getDep)
+//TODO - implement registry retriving (for debug)
 DMUtils = {
     /**
      * Each utility function
