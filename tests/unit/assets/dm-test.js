@@ -454,43 +454,6 @@ YUI.add('dm-test', function(Y){
         tearDown : function(){
             Y.one('#dump').empty();
             DM.removeAll();
-        },
-
-        "Should check that before/add/after are executed with correct context" : function(){
-            var test = this,
-                mock = new Y.Mock();
-
-            Y.Mock.expect(mock, {
-                method    : 'add',
-                run       : function(){
-                    Assert.areSame(test.contexts.fooMain, this.context, 'this.context should be same as third argument of `add`');
-                },
-                callCount : 3 //we have 3 elements with foo data marker
-            });
-
-            Y.Mock.expect(mock, {
-                method    : 'before',
-                run       : function(){
-                    Assert.areSame(test.contexts.fooBefore, this.context, 'this.context should be same as third argument of `before`');
-                },
-                callCount : 3 //we have 3 elements with foo data marker
-            });
-
-            Y.Mock.expect(mock, {
-                method    : 'after',
-                run       : function(){
-                    Assert.areSame(test.contexts.fooAfter, this.context, 'this.context should be same as third argument of `after`');
-                },
-                callCount : 3 //we have 3 elements with foo data marker
-            });
-
-            DM.add('foo', mock.add, this.contexts.fooMain);
-            DM.before('foo', mock.before, this.contexts.fooBefore);
-            DM.after('foo', mock.after, this.contexts.fooAfter);
-
-            DM.go();
-
-            Y.Mock.verify(mock);
         }
     }));
 
