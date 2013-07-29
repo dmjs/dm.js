@@ -8,6 +8,8 @@ This will allows you do not use CSS selectors to find the elements.
 
 Current version is: __*0.4.3*__
 
+![Travis](https://travis-ci.org/dmjs/dm.js.png?branch=master)
+
 ##Example
 
     <!doctype html>
