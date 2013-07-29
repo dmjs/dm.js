@@ -847,21 +847,21 @@ YUI.add('dm-test', function(Y){
                 }
             });
 
-            DM.before('foo', mock.before_p100, null, 100);
-            DM.before('foo', mock.before_p10, null, 10);
-            DM.before('foo', mock.before_0, null, 0);
-            DM.before('foo', mock.before_m10, null, -10);
-            DM.before('foo', mock.before_m100, null, -100);
-            DM.before('foo', mock.before, null);
+            DM.before('foo', mock.before_p100, 100);
+            DM.before('foo', mock.before_p10, 10);
+            DM.before('foo', mock.before_0, 0);
+            DM.before('foo', mock.before_m10, -10);
+            DM.before('foo', mock.before_m100, -100);
+            DM.before('foo', mock.before);
 
             DM.add('foo', mock.body);
 
-            DM.after('foo', mock.after_p100, null, 100);
-            DM.after('foo', mock.after_p10, null, 10);
-            DM.after('foo', mock.after_0, null, 0);
-            DM.after('foo', mock.after_m10, null, -10);
-            DM.after('foo', mock.after_m100, null, -100);
-            DM.after('foo', mock.after, null);
+            DM.after('foo', mock.after_p100, 100);
+            DM.after('foo', mock.after_p10, 10);
+            DM.after('foo', mock.after_0, 0);
+            DM.after('foo', mock.after_m10, -10);
+            DM.after('foo', mock.after_m100, -100);
+            DM.after('foo', mock.after);
 
             DM.go();
 
@@ -1598,7 +1598,36 @@ YUI.add('dm-test', function(Y){
         }
     }));
 
+    Y.Test.Runner.add(new Y.Test.Case({
+        name : 'DOM Markers : Cover dependencies support',
+
+        setUp : function(){
+            Y.one('#dump').setHTML('' +
+                '<div id="node-a" modules="foo">' +
+                '    <div data-foo="fooChild"></div>' +
+                '</div>' +
+                '<div id="node-b" data-marker="ipsum">' +
+                '    <div ipsum="ipsumChild"></div>' +
+                '</div>' +
+                '<div id="node-c" modules="bar">' +
+                '    <div bar="barChild"></div>' +
+                '</div>' +
+                '');
+
+            this.nodes = {
+                a : Y.one('#node-a'),
+                b : Y.one('#node-b'),
+                c : Y.one('#node-c')
+            };
+        },
+
+        tearDown : function(){
+            Y.one('#dump').empty();
+            DM.removeAll();
+            DM.resetConfig();
+        }
+    }));
+
     //todo - cover dependency support
     //todo - run the tests with jQuery
-    //todo - add tests of DM.config
 }, '0.4.3', {requires : ['dm', 'test']});
