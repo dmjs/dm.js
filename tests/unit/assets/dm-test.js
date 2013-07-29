@@ -1,6 +1,7 @@
 YUI.add('dm-test', function(Y){
 
     var Assert = Y.Assert,
+        assert = Y.assert,
         ArrayAssert = Y.ArrayAssert;
 
     Y.Test.Runner.add(new Y.Test.Case({
@@ -1333,7 +1334,270 @@ YUI.add('dm-test', function(Y){
         }
     }));
 
-    //todo - cover children support
+    Y.Test.Runner.add(new Y.Test.Case({
+        name : 'DOM Markers : Test children() support',
+
+        setUp : function(){
+            Y.one('#dump').setHTML('' +
+                '<div id="node-a" data-marker="foo,bar">' +
+                '    <div data-foo="childA[10, true]" data-bar="bar1"></div>' +
+                '    <div data-foo="childA"></div>' +
+                '    <div data-foo="childB" data-bar="bar1[22]"></div>' +
+                '</div>' +
+            '');
+
+            this.nodes = {
+                a : Y.one('#node-a')
+            };
+        },
+
+        "Should find childA[10], childA[20] & childB children of foo module" : function() {
+            var mock = new Y.Mock,
+                test = this;
+
+            Y.Mock.expect(mock, {
+                method : 'fooBody',
+                run    : function(){
+                    var children = this.children();
+
+                    Assert.areSame(2, children.childA.length, "should have 2 children with childA role");
+                    Assert.areSame(1, children.childB.length, "should have 1 child with childB role");
+                    Assert.areSame(10, children.childA[0].args[0], "first childA child should have `10` as first argument");
+                    Assert.areSame(true, children.childA[0].args[1], "first childA should have `true` as second argument");
+                    Assert.areSame(0, children.childA[1].args.length, "second childA should have zero arguments count");
+                }
+            });
+
+            DM.add('foo', mock.fooBody);
+
+            DM.go();
+
+            Y.Mock.verify(mock);
+        },
+
+        tearDown : function(){
+            Y.one('#dump').empty();
+            DM.removeAll();
+        },
+
+        "Should find bar1 children of bar module" : function() {
+            var mock = new Y.Mock,
+                test = this;
+
+            Y.Mock.expect(mock, {
+                method : 'barBody',
+                run    : function(){
+                    var children = this.children();
+
+                    Assert.areSame(2, children.bar1.length, "should have 2 children with bar1 role");
+                    Assert.areSame(0, children.bar1[0].args.length, "first bar1 should have zero arguments count");
+                    Assert.areSame(22, children.bar1[1].args[0], "second bar1 child should have `22` as first argument");
+                }
+            });
+
+            DM.add('bar', mock.barBody);
+
+            DM.go();
+
+            Y.Mock.verify(mock);
+        },
+
+        "Should verify that different modules could use same parent & children nodes" : function() {
+            var mock = new Y.Mock,
+                test = this;
+
+            Y.Mock.expect(mock, {
+                method : 'fooBody',
+                run    : function(){
+                    var children = this.children();
+
+                    Assert.areSame(2, children.childA.length, "should have 2 children with childA role");
+                    Assert.areSame(1, children.childB.length, "should have 1 child with childB role");
+                    Assert.areSame(10, children.childA[0].args[0], "first childA child should have `10` as first argument");
+                    Assert.areSame(true, children.childA[0].args[1], "first childA should have `true` as second argument");
+                    Assert.areSame(0, children.childA[1].args.length, "second childA should have zero arguments count");
+                }
+            });
+
+            Y.Mock.expect(mock, {
+                method : 'fooBody',
+                run    : function(){
+                    var children = this.children();
+
+                    Assert.areSame(2, children.childA.length, "should have 2 children with childA role");
+                    Assert.areSame(1, children.childB.length, "should have 1 child with childB role");
+                    Assert.areSame(10, children.childA[0].args[0], "first childA child should have `10` as first argument");
+                    Assert.areSame(true, children.childA[0].args[1], "first childA should have `true` as second argument");
+                    Assert.areSame(0, children.childA[1].args.length, "second childA should have zero arguments count");
+                }
+            });
+
+            DM.add('foo', mock.fooBody);
+            DM.add('bar', mock.barBody);
+
+            DM.go();
+
+            Y.Mock.verify(mock);
+        }
+    }));
+
+    Y.Test.Runner.add(new Y.Test.Case({
+        name : 'DOM Markers : Test DM.config()',
+
+        setUp : function(){
+            Y.one('#dump').setHTML('' +
+                '<div id="node-a" modules="foo">' +
+                '    <div data-foo="fooChild"></div>' +
+                '</div>' +
+                '<div id="node-b" data-marker="ipsum">' +
+                '    <div ipsum="ipsumChild"></div>' +
+                '</div>' +
+                '<div id="node-c" modules="bar">' +
+                '    <div bar="barChild"></div>' +
+                '</div>' +
+                '');
+
+            this.nodes = {
+                a : Y.one('#node-a'),
+                b : Y.one('#node-b'),
+                c : Y.one('#node-c')
+            };
+        },
+
+        tearDown : function(){
+            Y.one('#dump').empty();
+            DM.removeAll();
+            DM.resetConfig();
+        },
+
+        "Should check that DM.resetConfig() work as expected" : function() {
+            DM.config({
+                attr : 'attr-test',
+                prefix : 'prefix-test'
+            });
+
+            Assert.areSame('attr-test', DM.config('attr'));
+            Assert.areSame('prefix-test', DM.config('prefix'));
+
+            DM.resetConfig();
+
+            Assert.areSame('data-marker', DM.config('attr'));
+            Assert.areSame('data-', DM.config('prefix'));
+        },
+
+        "Should allow to change `data-marker` attribute ( DM.config('attr', 'newAttr') )" : function() {
+            var mock = new Y.Mock,
+                test = this;
+
+            DM.config('attr', 'modules');
+
+            Y.Mock.expect(mock, {
+                method : 'fooBody',
+                run    : function(){
+                    var children = this.children();
+
+                    Assert.areSame(1, children.fooChild.length, "Should have 1 fooChild child");
+                }
+            });
+
+            DM.add('foo', mock.fooBody);
+            DM.go();
+
+            Y.Mock.verify(mock);
+        },
+
+        "Should allow to change `data-marker` attribute ( DM.config({ attr : 'newAttr' }) )" : function(){
+            var mock = new Y.Mock,
+                test = this;
+
+            DM.config({
+                attr: 'modules'
+            });
+
+            Y.Mock.expect(mock, {
+                method : 'fooBody',
+                run    : function(){
+                    var children = this.children();
+
+                    Assert.areSame(1, children.fooChild.length, "Should have 1 fooChild child");
+                }
+            });
+
+            DM.add('foo', mock.fooBody);
+            DM.go();
+
+            Y.Mock.verify(mock);
+        },
+
+        "Should allow to change `data-MODULE_NAME` attribute ( DM.config('prefix', 'newPrefix') )" : function() {
+            var mock = new Y.Mock,
+                test = this;
+
+            DM.config('prefix', '');
+
+            Y.Mock.expect(mock, {
+                method : 'ipsumBody',
+                run    : function(){
+                    var children = this.children();
+
+                    Assert.areSame(1, children.ipsumChild.length, "Should have 1 ipsumChild child");
+                }
+            });
+
+            DM.add('ipsum', mock.ipsumBody);
+            DM.go();
+
+            Y.Mock.verify(mock);
+        },
+
+        "Should allow to change `data-MODULE_NAME` attribute ( DM.config({ prefix : 'newPrefix' }) )" : function() {
+            var mock = new Y.Mock,
+                test = this;
+
+            DM.config({
+                prefix : ''
+            });
+
+            Y.Mock.expect(mock, {
+                method : 'ipsumBody',
+                run    : function(){
+                    var children = this.children();
+
+                    Assert.areSame(1, children.ipsumChild.length, "Should have 1 ipsumChild child");
+                }
+            });
+
+            DM.add('ipsum', mock.ipsumBody);
+            DM.go();
+
+            Y.Mock.verify(mock);
+        },
+
+        "Should change both attr & prefix strings" : function() {
+            var mock = new Y.Mock,
+                test = this;
+
+            DM.config({
+                attr : 'modules',
+                prefix : ''
+            });
+
+            Y.Mock.expect(mock, {
+                method : 'barBody',
+                run    : function(){
+                    var children = this.children();
+
+                    Assert.areSame(1, children.barChild.length, "Should have 1 barChild child");
+                }
+            });
+
+            DM.add('bar', mock.barBody);
+            DM.go();
+
+            Y.Mock.verify(mock);
+        }
+    }));
+
     //todo - cover dependency support
     //todo - run the tests with jQuery
     //todo - add tests of DM.config
