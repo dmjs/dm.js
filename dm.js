@@ -511,9 +511,13 @@ DM = (function(options){
     var _modules = {},
         _engine,
         _bind = {},
-        _config = {
+        _config_default = {
             attr   : 'data-marker',
             prefix : 'data-'
+        },
+        _config = {
+            attr   : _config_default.attr,
+            prefix : _config_default.prefix
         };
 
     function initEngine(callback){
@@ -846,6 +850,18 @@ DM = (function(options){
          */
         removeAll : function(){
             _modules = {};
+            return this;
+        },
+        /**
+         * Return DM.config to default values
+         * @returns {DM}
+         */
+        resetConfig : function() {
+            _config = {
+                attr   : _config_default.attr,
+                prefix : _config_default.prefix
+            };
+
             return this;
         }
     };
