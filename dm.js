@@ -60,7 +60,7 @@ DMUtils = {
      * @return {Array.<{name:String,args:Array}>}
      */
     getModules    : function(node, attrName){
-        return DMUtils.map(node.getAttribute(attrName).match(/([a-z\-]+(\[[^[]+\])?)/ig) || [], function(str){
+        return DMUtils.map(node.getAttribute(attrName).match(/([a-z][a-z\-0-9]+(\[[^[]+\])?)/ig) || [], function(str){
             var parts = str.match(/[^\[\]]+/ig),
                 name,
                 args;
