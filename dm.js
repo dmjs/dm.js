@@ -231,7 +231,7 @@ function DMModule(name, callback, dependency){
     this.uuid = DMUtils.uuid();
     this.name = name;
     this.ready = false;
-    this.global = {};
+    this.data = {};
 
     this._dependency = [];
     this._before = [];
@@ -242,7 +242,7 @@ function DMModule(name, callback, dependency){
     DMUtils.each(dependency, function(name) {
         this._dependency.push({
             name      : name,
-            global    : null,
+            data      : null,
             instances : []
         });
     }, this);
@@ -329,7 +329,7 @@ function DMExec(module, inst, finish){
     this.module = module;
     this.node = inst.node;
     this.args = inst.args;
-    this.context = inst.context;
+    this.data = inst.data;
 
     this._state = 0;
     this._index = 0;
@@ -617,7 +617,7 @@ DM = (function(options){
                 DMUtils.each(module._dependency, function(dep){
                     var mod = getModule(dep.name);
                     dep.instances = mod._instances;
-                    dep.global = mod.global;
+                    dep.data = mod.data;
                 });
 
                 (new DMExec(module, inst, cb)).execute();
@@ -731,9 +731,9 @@ DM = (function(options){
                         var module = getModule(data.name);
                         if (module && DMUtils.updateNodeState(node, module, _modules)) {
                             module._instances.push({
-                                node    : node,
-                                args    : data.args,
-                                context : {}
+                                node : node,
+                                args : data.args,
+                                data : {}
                             });
                         }
                     });
