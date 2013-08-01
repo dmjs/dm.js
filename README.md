@@ -6,7 +6,7 @@ This will allows you do not use CSS selectors to find the DOM elements.
 
 ##Version
 
-Current version is: __*0.5.0*__
+Current version is: __*0.5.0*__ (in progress)
 
 [![Build Status](https://secure.travis-ci.org/dmjs/dm.js.png?branch=master)](http://travis-ci.org/dmjs/dm.js)
 
