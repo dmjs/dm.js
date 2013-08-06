@@ -180,7 +180,6 @@ In order to run tests makes sure that [bower][bower] is installed & you have ins
 Make sure that [grover][github-grover] is installed
 
 <pre>
-$cd /path/to/library/root
 $npm test
 </pre>
 
