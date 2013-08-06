@@ -1,20 +1,19 @@
-/*
- * DOM Markers 0.4.3
- * Copyright 2013 Eugene Poltorakov
- * Licensed under the MIT License: http://www.opensource.org/licenses/mit-license.php
+/**
+ * DOM Markers
+ *
+ * @module dm
  */
 
-var DM, DMUtils;
 //TODO - outer dependencies support (addDep, removeDep, getDep)
 //TODO - implement registry retrieving (for debug)
-DMUtils = {
+var DMUtils = {
     /**
      * Each utility function
      * @param {Object} obj
      * @param {Function} callback
      * @param {Object?} context
      */
-    each          : function(obj, callback, context){
+    each : function(obj, callback, context){
         var i;
 
         for (i in obj) {
@@ -23,6 +22,7 @@ DMUtils = {
             }
         }
     },
+
     /**
      * Map utility function
      * @param {Array} arr
@@ -30,37 +30,40 @@ DMUtils = {
      * @param {*?} context
      * @returns {*}
      */
-    map           : function(arr, callback, context){
+    map : function(arr, callback, context){
         return arr.map(callback, context);
     },
+
     /**
      * @param {String} selector
      * @param {Element|HTMLDocument|?} ctx
      * @returns {NodeList}
      */
-    all           : function(selector, ctx){
+    all : function(selector, ctx){
         if (!(ctx instanceof Element || ctx instanceof HTMLDocument)) {
             ctx = document;
         }
 
         return ctx.querySelectorAll(selector);
     },
+
     /**
      * Trim
      * @param {string} str
      * @returns {string}
      */
-    trim          : function(str){
+    trim : function(str){
         return str.trim();
     },
+
     /**
      *
      * @param {Element} node
      * @param {string} attrName
      * @return {Array.<{name:String,args:Array}>}
      */
-    getModules    : function(node, attrName){
-        return DMUtils.map(node.getAttribute(attrName).match(/([a-z\-]+(\[[^[]+\])?)/ig) || [], function(str){
+    getModules : function(node, attrName){
+        return DMUtils.map(node.getAttribute(attrName).match(/([a-zA-Z][a-zA-Z\-0-9]*(\[[^[]+\])?)/ig) || [], function(str){
             var parts = str.match(/[^\[\]]+/ig),
                 name,
                 args;
@@ -91,15 +94,17 @@ DMUtils = {
             };
         });
     },
+
     /**
      * Filter utility function
      * @param arr
      * @param callback
      * @returns {*}
      */
-    filter        : function(arr, callback){
+    filter : function(arr, callback){
         return arr.filter(callback);
     },
+
     /**
      * Filter modules (exclude already executed on node)
      * @param {Element} node
@@ -123,7 +128,8 @@ DMUtils = {
             return result;
         });
     },
-    updateNodeState : function(node, module, modules, state) {
+
+    updateNodeState : function(node, module, modules, state){
         var data,
             uuid,
             result;
@@ -136,11 +142,12 @@ DMUtils = {
         data[uuid] = state || result;
 
         /*if (module.name === 'B') {
-            debugger;
-        }*/
+         debugger;
+         }*/
 
         return result !== state;
     },
+
     shouldProcessNode : function(node, module, modules){
         var data,
             uuid,
@@ -158,31 +165,34 @@ DMUtils = {
 
         return result;
     },
-/*    isEmpty : function(object) {
+
+    /*    isEmpty : function(object) {
+     var i;//todo - probably should use some other way here
+     for(i in object) {
+     if (object.hasOwnProperty(i)) {
+     return false;
+     }
+     }
+     return true;
+     },*/
+
+    keysCount : function(object){
         var i;//todo - probably should use some other way here
-        for(i in object) {
-            if (object.hasOwnProperty(i)) {
-                return false;
-            }
-        }
-        return true;
-    },*/
-    keysCount : function(object) {
-        var i;//todo - probably should use some other way here
-        for(i in object) {
+        for (i in object) {
             if (object.hasOwnProperty(i)) {
                 i++;
             }
         }
         return i;
     },
+
     /**
      * InSort sorting implementation
      * @note Used cause of unstable native algorithm of Chrome
      * @param {Function?} fn
      * @returns {Array}
      */
-    inSort : function inSort(fn) {
+    inSort : function inSort(fn){
         var i, n, j, key;
         for (i = 1, n = this.length; i < n; i++) {
             key = this[i];
@@ -197,11 +207,12 @@ DMUtils = {
         }
         return this;
     },
+
     /**
      * Return new unique id
      * @returns {Function}
      */
-    uuid          : (function(){
+    uuid : (function(){
         var uuid = 0;
         return function(){
             return ++uuid;
@@ -210,30 +221,30 @@ DMUtils = {
 };
 
 /**
- * @param {string} name
- * @param {Function?} callback
- * @param {*?} context
- * @param {Array.<string>?} dependency
+ * Module constructor
+ *
+ * @param {string} name - name of the module
+ * @param {Function?} callback - main module callback
+ * @param {Array.<string>?} dependency - an array of modules names from which this depends
  * @constructor
+ * @class DMModule
  */
-function DMModule(name, callback, context, dependency){
+function DMModule(name, callback, dependency){
     this.uuid = DMUtils.uuid();
+    this.name = name;
+    this.ready = false;
+    this.data = {};
 
     this._dependency = [];
     this._before = [];
     this._after = [];
     this._instances = [];
-    this._add = {
-        callback : callback,
-        context  : context
-    };
-    this.name = name;
-    this.ready = false;
+    this._add = callback;
 
     DMUtils.each(dependency, function(name) {
         this._dependency.push({
             name      : name,
-            context   : null,
+            data      : null,
             instances : []
         });
     }, this);
@@ -241,9 +252,12 @@ function DMModule(name, callback, context, dependency){
 
 /**
  * Sort module
+ *
  * @param {Array} arr
- * @returns {this}
+ * @returns {DMModule}
  * @private
+ * @method _sort
+ * @chainable
  */
 DMModule.prototype._sort = function(arr){
     arr.sort(function(a, b){
@@ -262,49 +276,66 @@ DMModule.prototype._sort = function(arr){
 };
 
 /**
- * Preparation method
- * - Sort the callbacks
+ * Preparation method (before execution)
+ *
  * @returns {this}
+ * @private
+ * @method _prepare
+ * @chainable
  */
-DMModule.prototype.prepare = function(){
+DMModule.prototype._prepare = function(){
     this._sort(this._before)._sort(this._after);
     this.ready = true;
     return this;
 };
+
 /**
+ * Add `_before` callback to module
+ *
+ * Used by `DM.before`
+ *
+ * **internal use only**
+ *
  * @param {Function} callback
- * @param {*?} context
  * @param {Number?} weight
  * @returns {Number}
+ * @protected
+ * @method before
  */
-DMModule.prototype.before = function(callback, context, weight){
+DMModule.prototype.before = function(callback, weight){
     var id = DMUtils.uuid();
 
     this.ready = false;
 
     this._before.push({
         callback : callback,
-        context  : context,
         weight   : weight || 0,
         uuid     : id
     });
 
     return id;
 };
+
 /**
+ * Add `_after` callback to module
+ *
+ * Used by `DM.after`
+ *
+ * **internal use only**
+ *
  * @param {Function} callback
- * @param {*?} context
  * @param {Number?} weight
  * @returns {Number}
+ * @protected
+ * @method after
  */
-DMModule.prototype.after = function(callback, context, weight){
+DMModule.prototype.after = function(callback, weight){
     var id = DMUtils.uuid();
 
     this.ready = false;
 
     this._after.push({
         callback : callback,
-        context  : context,
         weight   : weight || 0,
         uuid     : id
     });
@@ -313,30 +344,45 @@ DMModule.prototype.after = function(callback, context, weight){
 };
 
 /**
- * DMExec
- * Execution constructor; Manage callbacks execution
- * @param module
- * @param node
- * @param args
- * @param finish
+ * Constructor of execution manager
+ *
+ * Used as `this` context for the all `(add, before, after)` execution callbacks
+ *
+ * @param {DMModule} module
+ * @param {Object} inst - {node:Element, args:Array, data: *}
+ * @param {Function} finish - execution finish callback
  * @constructor
+ * @class DMExec
  */
-function DMExec(module, node, args, finish){
+function DMExec(module, inst, finish){
     this.module = module;
-    this.node = node;
-    this.args = args;
+    this.node = inst.node;
+    this.args = inst.args;
+    this.data = inst.data;
 
     this._state = 0;
     this._index = 0;
-    this.context = null;
     this._waiting = null;
     this._finish = finish;
     this._timer = null;
+
+    this._execute();
 }
 
 /**
- * Execution states
+ * Internal execution states;
+ *
+ * **internal use only**
+ *
+ * - `INITIAL` - initial state
+ * - `BEFORE` - execution of _before_ callbacks
+ * - `MAIN` - execution of _add_ callback
+ * - `AFTER` - execution of _after_ callbacks
+ * - `FINISHED` - finished state
+ *
  * @type {{INITIAL: number, BEFORE: number, MAIN: number, AFTER: number, FINISHED: number}}
+ * @property STATES
+ * @static
  */
 DMExec.STATES = {
     INITIAL  : 0,
@@ -348,7 +394,12 @@ DMExec.STATES = {
 
 /**
  * Execution types
+ *
+ * **internal use only**
+ *
  * @type {{NEXT: string, STOP: string}}
+ * @property TYPES
+ * @static
  */
 DMExec.TYPES = {
     NEXT : 'next',
@@ -357,6 +408,8 @@ DMExec.TYPES = {
 
 /**
  * Force current execution manager instance to execute next callback
+ *
+ * @method next
  */
 DMExec.prototype.next = function(){
     if (this._waiting) {
@@ -364,11 +417,13 @@ DMExec.prototype.next = function(){
         clearTimeout(this._timer);
     }
     this._index++;
-    this.execute(DMExec.TYPES.NEXT);
+    this._execute(DMExec.TYPES.NEXT);
     //todo - should we stop any other code below the next call ?
 };
 /**
  * Stops current execution
+ *
+ * @method stop
  */
 DMExec.prototype.stop = function(){
     if (this._waiting) {
@@ -377,14 +432,19 @@ DMExec.prototype.stop = function(){
     }
     this._index = 0;
     this._state = DMExec.STATES.FINISHED;
-    this.execute(DMExec.TYPES.STOP);
+    this._execute(DMExec.TYPES.STOP);
 };
 /**
  * Proceed callback execution
+ *
+ * **internal use only**
+ *
  * @param {String?} type
+ * @method _execute
  * @returns {DMExec}
+ * @protected
  */
-DMExec.prototype.execute = function(type){
+DMExec.prototype._execute = function(type){
     var states = DMExec.STATES,
         types = DMExec.TYPES,
         module = this.module,
@@ -392,7 +452,7 @@ DMExec.prototype.execute = function(type){
 
     if (!(type === types.NEXT && this._state === states.INITIAL)) {
         if (!module.ready) {
-            module.prepare();
+            module._prepare();
         }
     }
 
@@ -407,7 +467,6 @@ DMExec.prototype.execute = function(type){
             obj = module[this._state === states.BEFORE ? '_before' : '_after'][this._index];
 
             if (obj && typeof obj.callback === 'function') {
-                this.context = obj.context;
                 obj.callback.apply(this, this.args);
             }
             else {
@@ -420,15 +479,13 @@ DMExec.prototype.execute = function(type){
             this._state = states.AFTER;
             this._index = -1;
             //todo - should provide correct state & index properties inside current execution context
-            if (typeof module._add.callback === 'function') {
-                this.context = module._add.context;
-                module._add.callback.apply(this, this.args);
+            if (typeof module._add === 'function') {
+                module._add.apply(this, this.args);
             }
             break;
         case states.FINISHED:
             this._state = states.INITIAL;
             this._index = 0;
-            this.context = null;
 
             if (typeof this._finish === 'function') {
                 this._finish.call(this);
@@ -445,9 +502,11 @@ DMExec.prototype.execute = function(type){
 };
 
 /**
- * Initiate timeout
- * @param {number?} timeout - wait timeout in ms; default: 5000
- * @param {boolean?} stop - will abort execution if timeout reached & value is true; default: false
+ * Initiate execution timeout
+ *
+ * @param {number?} timeout - wait timeout in ms; `default: 5000`
+ * @param {boolean?} stop - will abort execution if timeout reached & value is true; `default: false`
+ * @method wait
  */
 DMExec.prototype.wait = function(timeout, stop){
     var self = this;
@@ -460,12 +519,26 @@ DMExec.prototype.wait = function(timeout, stop){
 };
 
 /**
- * @returns {*}
+ * Return children elements data
+ *
+ * Structure:
+ *
+ *     Object {
+ *         module_name : Array.<
+ *             {
+ *                 node : Element
+ *                 args : Array
+ *             }
+ *         >,
+ *         ...
+ *     }
+ *
+ * @returns {Object}
+ * @method children
  */
 DMExec.prototype.children = function(){
     //todo - should accept role
     //todo - should cache
-    //todo - cover with tests
     var attrName,
         nodes,
         result = {};
@@ -488,6 +561,28 @@ DMExec.prototype.children = function(){
     return result;
 };
 
+/**
+ * Return dependency information
+ *
+ * Structure:
+ *
+ *     Object {
+ *         name : String - name of the module
+ *         data : * - Global (per module) execution context (mixed data)
+ *         instances: Array.<
+ *             {
+ *                 node : Element
+ *                 args : Array
+ *                 data : *
+ *             }
+ *         >
+ *     }
+ *
+ *
+ * @param {string} name
+ * @returns {Object?}
+ * @method dependency
+ */
 DMExec.prototype.dependency = function(name){
     var i, l, dependencies, result;
 
@@ -503,17 +598,21 @@ DMExec.prototype.dependency = function(name){
 };
 
 /**
- * Singleton; Main library wrapper;
+ * Main library wrapper
  *
- * {{add:Function,before:Function,after:Function,go:Function,detach:Function,remove:Function,removeAll:Function}}
+ * @class DM
  */
-DM = (function(options){
+var DM = (function(options){
     var _modules = {},
         _engine,
         _bind = {},
-        _config = {
+        _config_default = {
             attr   : 'data-marker',
             prefix : 'data-'
+        },
+        _config = {
+            attr   : _config_default.attr,
+            prefix : _config_default.prefix
         };
 
     function initEngine(callback){
@@ -577,12 +676,11 @@ DM = (function(options){
      * Create new {DMModule} instance
      * @param {string} name
      * @param {Function?} callback
-     * @param {Object?} context
      * @param {Array.<string>?} dependency
      * @returns {DMModule}
      */
-    function createModule(name, callback, context, dependency){
-        return _modules[name] = new DMModule(name, callback, context, dependency);
+    function createModule(name, callback, dependency){
+        return _modules[name] = new DMModule(name, callback, dependency);
     }
 
     /**
@@ -610,113 +708,100 @@ DM = (function(options){
     function executeModule(module, cb) {
         DMUtils.each(module._instances, function(inst) {
             if (DMUtils.updateNodeState(inst.node, module, _modules, 2)) {
-
                 //update dependencies
                 DMUtils.each(module._dependency, function(dep){
                     var mod = getModule(dep.name);
-                    dep.context = mod._add.context;
                     dep.instances = mod._instances;
+                    dep.data = mod.data;
                 });
 
-                (new DMExec(module, inst.node, inst.data.args, cb)).execute();
+                new DMExec(module, inst, cb);
             }
         });
     }
 
     return {
         /**
+         * Declare DM module
          *
-         * @param {string|Object} cfg
-         * @param {string?} value
-         * @returns {*}
+         * @param {String} name - name of the module
+         * @param {Function?} callback - the module body function
+         * @param {Array.<string>?} dependency - an array of modules names from which this depends
+         * @returns {Number} - UUID of the callback
+         * @static
+         * @method add
+         * @throws Error - if the module already declared
          */
-        config : function(cfg, value) {
-            var result, i;
-
-            if (typeof cfg === 'string') {
-                if (cfg in _config) {
-                    if (typeof value === 'string') {
-                        _config[cfg] = value;
-                    }
-                    else {
-                        result = _config[cfg];
-                    }
-                }
-            }
-            else if (typeof cfg === 'object') {
-                for(i in cfg) {
-                    if (cfg.hasOwnProperty(i) &&i in _config && typeof cfg[i] === 'string') {
-                      _config[i] = cfg[i];
-                    }
-                }
-            }
-
-            return result;
-        },
-        /**
-         *
-         * @param {String} name
-         * @param {Function?} callback
-         * @param {*?} context
-         * @param {Array.<string>?} dependency
-         * @returns {Number}
-         */
-        add       : function(name, callback, context, dependency){
+        add : function(name, callback, dependency){
             var module = getModule(name);
             if (module) {
-                if (typeof module._add.callback === 'function') {
+                if (typeof module._add === 'function') {
                     throw new Error('Module(' + name + ') main callback is already defined');
                 }
                 else {
-                    module._add.callback = callback;
-                    module._add.context = context;
+                    module._add = callback;
                 }
             }
             else {
-                module = createModule(name, callback, context, dependency);
+                module = createModule(name, callback, dependency);
             }
 
             return module.uuid;
         },
+
         /**
+         * Declare the callback preceding the module body function
          *
-         * @param {String} name
-         * @param {Function} callback
-         * @param {*?} context
-         * @param {Number?} weight
-         * @returns {Number}
+         * If the module weren't created by `DM.add`: new module (without the body) will be created implicitly
+         *
+         * @param {String} name - name of the module
+         * @param {Function} callback - the module preceding function
+         * @param {Number?} weight - the weight of the callback (lower have the bigger priority)
+         * @returns {Number} - UUID of the callback
+         * @static
+         * @method before
+         * @throws Error - if the callback attribute is not a function
          */
-        before    : function(name, callback, context, weight){
+        before : function(name, callback, weight){
             var module = getModule(name) || createModule(name);
 
             if (typeof callback !== 'function') {
                 throw new Error('Callback should be a function');
             }
 
-            return module.before(callback, context, weight);
+            return module.before(callback, weight);
         },
+
         /**
+         * Declare the callback succeeding the module body function
          *
-         * @param {String} name
-         * @param {Function} callback
-         * @param {*?} context
-         * @param {Number?} weight
-         * @returns {Number}
+         * @param {String} name - name of the module
+         * @param {Function} callback - the module succeeding function
+         * @param {Number?} weight - the weight of the callback (lower have the bigger priority)
+         * @returns {Number} - UUID of the callback
+         * @static
+         * @method after
+         * @throws Error - if the callback attribute is not a function
          */
-        after     : function(name, callback, context, weight){
+        after : function(name, callback, weight){
             var module = getModule(name) || createModule(name);
 
             if (typeof callback !== 'function') {
                 throw new Error('Callback should be a function');
             }
 
-            return module.after(callback, context, weight);
+            return module.after(callback, weight);
         },
+
         /**
          * Initiate callbacks execution
+         *
          * @returns {DM}
+         * @static
+         * @method go
+         * @chainable
          */
-        go        : function(){
+        go : function(){
             //todo - should accept & execute only asked module(s): Array.<string>
             initEngine(function(){
                 var ATTR = DM.config('attr'),
@@ -727,11 +812,11 @@ DM = (function(options){
 
                     DMUtils.each(modules, function(data){
                         var module = getModule(data.name);
-
                         if (module && DMUtils.updateNodeState(node, module, _modules)) {
                             module._instances.push({
                                 node : node,
-                                data : data
+                                args : data.args,
+                                data : {}
                             });
                         }
                     });
@@ -739,7 +824,7 @@ DM = (function(options){
 
                 var executed = [];
 
-                var finishCallback = function() {
+                var finishCallback = function(){
                     executed.push(this.module.name);
 
                     if (_bind[this.module.name]) {
@@ -762,7 +847,7 @@ DM = (function(options){
                     }
                 };
 
-                DMUtils.each(_modules, function(module) {
+                DMUtils.each(_modules, function(module){
                     if (module._dependency.length === 0) {
                         executeModule(module, finishCallback);
                     }
@@ -773,11 +858,17 @@ DM = (function(options){
             });
             return this;
         },
+
         /**
-         * @param {Number} uuid
-         * @return {DMExec}
+         * Detach the callback
+         *
+         * @param {Number} uuid - UUID of the callback
+         * @return {DM}
+         * @static
+         * @method detach
+         * @chainable
          */
-        detach    : function(uuid){
+        detach : function(uuid){
             var name,
                 i,
                 obj,
@@ -792,8 +883,7 @@ DM = (function(options){
 
                     if (module.uuid === uuid) {
                         //remove _add c/c
-                        module._add.context = null;
-                        module._add.callback = null;
+                        module._add = null;
                         found = true;
                     }
                     else {
@@ -829,23 +919,90 @@ DM = (function(options){
             }
             return this;
         },
+
         /**
-         * Remove module from DM
-         * @param name
-         * @returns {DM}
+         * Remove module from registry
+         *
+         * @param {string} name - module name
+         * @return {DM}
+         * @static
+         * @method remove
+         * @chainable
          */
-        remove    : function(name){
+        remove : function(name){
             if (_modules[name]) {
                 delete _modules[name];
             }
             return this;
         },
+
         /**
-         * Remove all modules from DM registry
+         * Remove all modules from registry
+         *
          * @returns {DM}
+         * @static
+         * @method removeAll
+         * @chainable
          */
         removeAll : function(){
             _modules = {};
+            return this;
+        },
+
+        /**
+         * Configuration getter/getter
+         *
+         * Currently available configuration keys: attr, prefix
+         *
+         * - Getting the current value, call this with the only one string parameter:
+         *   _name_ of the configuration property
+         * - Set the single value `DM.config(string_name, string_value)`
+         * - Set any number of values `DM.config(Object.<key:value>)`
+         *
+         * @param {string|Object} cfg
+         * @param {string?} value
+         * @returns {string?} - current configuration value (`DM.config(string_value)
+         * @static
+         * @method config
+         */
+        config : function(cfg, value){
+            var result, i;
+
+            if (typeof cfg === 'string') {
+                if (cfg in _config) {
+                    if (typeof value === 'string') {
+                        _config[cfg] = value;
+                    }
+                    else {
+                        result = _config[cfg];
+                    }
+                }
+            }
+            else if (typeof cfg === 'object') {
+                for (i in cfg) {
+                    if (cfg.hasOwnProperty(i) && i in _config && typeof cfg[i] === 'string') {
+                        _config[i] = cfg[i];
+                    }
+                }
+            }
+
+            return result;
+        },
+
+        /**
+         * Revert inner configuration to default values
+         *
+         * @returns {DM}
+         * @static
+         * @method resetConfig
+         * @chainable
+         */
+        resetConfig : function(){
+            _config = {
+                attr   : _config_default.attr,
+                prefix : _config_default.prefix
+            };
+
             return this;
         }
     };

@@ -1,0 +1,11 @@
+{
+    "options" : {
+        "exclude" : "components,tests",
+        "outdir"   : "docs/out",
+        "meta"     : {
+            "projectLogo" : false
+        },
+        "themedir" : "docs/theme",
+        "tabtospace" : 4
+    }
+}
