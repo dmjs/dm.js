@@ -53,6 +53,15 @@ Checkout the [Demos][demos]
 
 Checkout our [Wiki pages][wiki] to see full details
 
+##Generate Docs
+
+API docs is generated with [yuidoc][github-yuidoc]
+
+<pre>
+$yuidoc .
+</pre>
+
+
 ##Running tests
 
 In order to run tests makes sure that [bower][bower] is installed & you have installed dependencies (`$bower install`)
@@ -62,7 +71,6 @@ In order to run tests makes sure that [bower][bower] is installed & you have ins
 Make sure that [grover][github-grover] is installed
 
 <pre>
-$cd /path/to/library/root
 $npm test
 </pre>
 
@@ -83,8 +91,9 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 [demos]:http://dmjs.github.io/dm.js/demo/
-[changelog]:CHANGELOG.md
+[changelog]:https://github.com/dmjs/dm.js/wiki/Changelog
 [release]:https://github.com/dmjs/dm.js/zipball/master
 [bower]:http://bower.io/
 [github-grover]:https://github.com/yui/grover
+[github-yuidoc]:https://github.com/yui/yuidoc
 [wiki]:https://github.com/dmjs/dm.js/wiki

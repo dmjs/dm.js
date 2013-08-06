@@ -1593,4 +1593,4 @@ YUI.add('dm-test', function(Y){
 
     //todo - cover dependency support
     //todo - run the tests with jQuery
-}, '0.4.3', {requires : ['dm', 'test']});
+}, '0.5.0', {requires : ['dm', 'test']});
