@@ -1,0 +1,928 @@
+{
+    "project": {
+        "name": "dm",
+        "description": "Gives the simple website development workflow.",
+        "version": "0.5.0"
+    },
+    "files": {
+        "dm.js": {
+            "name": "dm.js",
+            "modules": {
+                "dm": 1
+            },
+            "classes": {
+                "DMModule": 1,
+                "DMExec": 1,
+                "DM": 1
+            },
+            "fors": {},
+            "namespaces": {}
+        }
+    },
+    "modules": {
+        "dm": {
+            "name": "dm",
+            "submodules": {},
+            "classes": {
+                "DMModule": 1,
+                "DMExec": 1,
+                "DM": 1
+            },
+            "fors": {},
+            "namespaces": {},
+            "tag": "module",
+            "file": "dm.js",
+            "line": 600,
+            "description": "DOM Markers"
+        }
+    },
+    "classes": {
+        "DMModule": {
+            "name": "DMModule",
+            "shortname": "DMModule",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "dm",
+            "namespace": "",
+            "file": "dm.js",
+            "line": 223,
+            "description": "Module constructor",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "- name of the module",
+                    "type": "String"
+                },
+                {
+                    "name": "callback",
+                    "description": "- main module callback",
+                    "type": "Function?"
+                },
+                {
+                    "name": "dependency",
+                    "description": "- an array of modules names from which this depends",
+                    "type": "Array.<string>?"
+                }
+            ],
+            "is_constructor": 1
+        },
+        "DMExec": {
+            "name": "DMExec",
+            "shortname": "DMExec",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "dm",
+            "namespace": "",
+            "file": "dm.js",
+            "line": 346,
+            "description": "Constructor of execution manager\n\nUsed as `this` context for the all `(add, before, after)` execution callbacks",
+            "params": [
+                {
+                    "name": "module",
+                    "description": "",
+                    "type": "DMModule"
+                },
+                {
+                    "name": "inst",
+                    "description": "- {node:Element, args:Array, data: *}",
+                    "type": "Object"
+                },
+                {
+                    "name": "finish",
+                    "description": "- execution finish callback",
+                    "type": "Function"
+                }
+            ],
+            "is_constructor": 1
+        },
+        "DM": {
+            "name": "DM",
+            "shortname": "DM",
+            "classitems": [],
+            "plugins": [],
+            "extensions": [],
+            "plugin_for": [],
+            "extension_for": [],
+            "module": "dm",
+            "namespace": "",
+            "file": "dm.js",
+            "line": 600,
+            "description": "Main library wrapper"
+        }
+    },
+    "classitems": [
+        {
+            "file": "dm.js",
+            "line": 10,
+            "description": "Each utility function",
+            "params": [
+                {
+                    "name": "obj",
+                    "description": "",
+                    "type": "Object"
+                },
+                {
+                    "name": "callback",
+                    "description": "",
+                    "type": "Function"
+                },
+                {
+                    "name": "context",
+                    "description": "",
+                    "type": "Object?"
+                }
+            ],
+            "class": "DMModule",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 26,
+            "description": "Map utility function",
+            "params": [
+                {
+                    "name": "arr",
+                    "description": "",
+                    "type": "Array"
+                },
+                {
+                    "name": "callback",
+                    "description": "",
+                    "type": "Function"
+                },
+                {
+                    "name": "context",
+                    "description": "",
+                    "type": "*?"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "*"
+            },
+            "class": "DMModule",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 37,
+            "params": [
+                {
+                    "name": "selector",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "ctx",
+                    "description": "",
+                    "type": "Element|HTMLDocument|?"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "NodeList"
+            },
+            "class": "DMModule",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 50,
+            "description": "Trim",
+            "params": [
+                {
+                    "name": "str",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "String"
+            },
+            "class": "DMModule",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 59,
+            "params": [
+                {
+                    "name": "node",
+                    "description": "",
+                    "type": "Element"
+                },
+                {
+                    "name": "attrName",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": ">}",
+                "type": "Array.<{name:String,args:Array"
+            },
+            "class": "DMModule",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 98,
+            "description": "Filter utility function",
+            "params": [
+                {
+                    "name": "arr",
+                    "description": ""
+                },
+                {
+                    "name": "callback",
+                    "description": ""
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "*"
+            },
+            "class": "DMModule",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 108,
+            "description": "Filter modules (exclude already executed on node)",
+            "params": [
+                {
+                    "name": "node",
+                    "description": "",
+                    "type": "Element"
+                },
+                {
+                    "name": "list",
+                    "description": "",
+                    "type": "Array"
+                },
+                {
+                    "name": "modules",
+                    "description": "",
+                    "type": "Object"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "*"
+            },
+            "class": "DMModule",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 189,
+            "description": "InSort sorting implementation",
+            "note": "Used cause of unstable native algorithm of Chrome",
+            "params": [
+                {
+                    "name": "fn",
+                    "description": "",
+                    "type": "Function?"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Array"
+            },
+            "class": "DMModule",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 211,
+            "description": "Return new unique id",
+            "return": {
+                "description": "",
+                "type": "Function"
+            },
+            "class": "DMModule",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 253,
+            "description": "Sort module",
+            "params": [
+                {
+                    "name": "arr",
+                    "description": "",
+                    "type": "Array"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "DMModule"
+            },
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "_sort",
+            "chainable": 1,
+            "class": "DMModule",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 278,
+            "description": "Preparation method (before execution)",
+            "return": {
+                "description": "",
+                "type": "This"
+            },
+            "access": "private",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "_prepare",
+            "chainable": 1,
+            "class": "DMModule",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 292,
+            "description": "Add `_before` callback to module\n\nUsed by `DM.before`\n\n**internal use only**",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "",
+                    "type": "Function"
+                },
+                {
+                    "name": "weight",
+                    "description": "",
+                    "type": "Number?"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Number"
+            },
+            "access": "protected",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "before",
+            "class": "DMModule",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 319,
+            "description": "Add `_after` callback to module\n\nUsed by `DM.after`\n\n**internal use only**",
+            "params": [
+                {
+                    "name": "callback",
+                    "description": "",
+                    "type": "Function"
+                },
+                {
+                    "name": "weight",
+                    "description": "",
+                    "type": "Number?"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Number"
+            },
+            "access": "protected",
+            "tagname": "",
+            "itemtype": "method",
+            "name": "after",
+            "class": "DMModule",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 372,
+            "description": "Internal execution states;\n\n**internal use only**\n\n- `INITIAL` - initial state\n- `BEFORE` - execution of _before_ callbacks\n- `MAIN` - execution of _add_ callback\n- `AFTER` - execution of _after_ callbacks\n- `FINISHED` - finished state",
+            "type": "{{INITIAL: number, BEFORE: number, MAIN: number, AFTER: number, FINISHED: number}}",
+            "itemtype": "property",
+            "name": "STATES",
+            "static": 1,
+            "class": "DMExec",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 395,
+            "description": "Execution types\n\n**internal use only**",
+            "type": "{{NEXT: string, STOP: string}}",
+            "itemtype": "property",
+            "name": "TYPES",
+            "static": 1,
+            "class": "DMExec",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 409,
+            "description": "Force current execution manager instance to execute next callback",
+            "itemtype": "method",
+            "name": "next",
+            "class": "DMExec",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 423,
+            "description": "Stops current execution",
+            "itemtype": "method",
+            "name": "stop",
+            "class": "DMExec",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 437,
+            "description": "Proceed callback execution\n\n**internal use only**",
+            "params": [
+                {
+                    "name": "type",
+                    "description": "",
+                    "type": "String?"
+                }
+            ],
+            "itemtype": "method",
+            "name": "_execute",
+            "return": {
+                "description": "",
+                "type": "DMExec"
+            },
+            "access": "protected",
+            "tagname": "",
+            "class": "DMExec",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 504,
+            "description": "Initiate execution timeout",
+            "params": [
+                {
+                    "name": "timeout",
+                    "description": "- wait timeout in ms; `default: 5000`",
+                    "type": "Number?"
+                },
+                {
+                    "name": "stop",
+                    "description": "- will abort execution if timeout reached & value is true; `default: false`",
+                    "type": "Boolean?"
+                }
+            ],
+            "itemtype": "method",
+            "name": "wait",
+            "class": "DMExec",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 521,
+            "description": "Return children elements data\n\nStructure:\n\n    Object {\n        module_name : Array.<\n            {\n                node : Element\n                args : Array\n            }\n        >,\n        ...\n    }",
+            "return": {
+                "description": "",
+                "type": "Object"
+            },
+            "itemtype": "method",
+            "name": "children",
+            "class": "DMExec",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 564,
+            "description": "Return dependency information\n\nStructure:\n\n    Object {\n        name : String - name of the module\n        data : * - Global (per module) execution context (mixed data)\n        instances: Array.<\n            {\n                node : Element\n                args : Array\n                data : *\n            }\n        >\n    }",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "Object?"
+            },
+            "itemtype": "method",
+            "name": "dependency",
+            "class": "DMExec",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 675,
+            "description": "Create new {DMModule} instance",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "",
+                    "type": "String"
+                },
+                {
+                    "name": "callback",
+                    "description": "",
+                    "type": "Function?"
+                },
+                {
+                    "name": "dependency",
+                    "description": "",
+                    "type": "Array.<string>?"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "DMModule"
+            },
+            "class": "DM",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 686,
+            "description": "Get existing module or false",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "DMModule|Boolean"
+            },
+            "class": "DM",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 724,
+            "description": "Declare DM module",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "- name of the module",
+                    "type": "String"
+                },
+                {
+                    "name": "callback",
+                    "description": "- the module body function",
+                    "type": "Function?"
+                },
+                {
+                    "name": "dependency",
+                    "description": "- an array of modules names from which this depends",
+                    "type": "Array.<string>?"
+                }
+            ],
+            "return": {
+                "description": "- UUID of the callback",
+                "type": "Number"
+            },
+            "static": 1,
+            "itemtype": "method",
+            "name": "add",
+            "throws": [
+                "Error - if the module already declared"
+            ],
+            "class": "DM",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 752,
+            "description": "Declare the callback preceding the module body function\n\nIf the module weren't created by `DM.add`: new module (without the body) will be created implicitly",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "- name of the module",
+                    "type": "String"
+                },
+                {
+                    "name": "callback",
+                    "description": "- the module preceding function",
+                    "type": "Function"
+                },
+                {
+                    "name": "weight",
+                    "description": "- the weight of the callback (lower have the bigger priority)",
+                    "type": "Number?"
+                }
+            ],
+            "return": {
+                "description": "- UUID of the callback",
+                "type": "Number"
+            },
+            "static": 1,
+            "itemtype": "method",
+            "name": "before",
+            "throws": [
+                "Error - if the callback attribute is not a function"
+            ],
+            "class": "DM",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 775,
+            "description": "Declare the callback succeeding the module body function",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "- name of the module",
+                    "type": "String"
+                },
+                {
+                    "name": "callback",
+                    "description": "- the module succeeding function",
+                    "type": "Function"
+                },
+                {
+                    "name": "weight",
+                    "description": "- the weight of the callback (lower have the bigger priority)",
+                    "type": "Number?"
+                }
+            ],
+            "return": {
+                "description": "- UUID of the callback",
+                "type": "Number"
+            },
+            "static": 1,
+            "itemtype": "method",
+            "name": "after",
+            "throws": [
+                "Error - if the callback attribute is not a function"
+            ],
+            "class": "DM",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 796,
+            "description": "Initiate callbacks execution",
+            "return": {
+                "description": "",
+                "type": "DM"
+            },
+            "static": 1,
+            "itemtype": "method",
+            "name": "go",
+            "chainable": 1,
+            "class": "DM",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 862,
+            "description": "Detach the callback",
+            "params": [
+                {
+                    "name": "uuid",
+                    "description": "- UUID of the callback",
+                    "type": "Number"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "DM"
+            },
+            "static": 1,
+            "itemtype": "method",
+            "name": "detach",
+            "chainable": 1,
+            "class": "DM",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 923,
+            "description": "Remove module from registry",
+            "params": [
+                {
+                    "name": "name",
+                    "description": "- module name",
+                    "type": "String"
+                }
+            ],
+            "return": {
+                "description": "",
+                "type": "DM"
+            },
+            "static": 1,
+            "itemtype": "method",
+            "name": "remove",
+            "chainable": 1,
+            "class": "DM",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 939,
+            "description": "Remove all modules from registry",
+            "return": {
+                "description": "",
+                "type": "DM"
+            },
+            "static": 1,
+            "itemtype": "method",
+            "name": "removeAll",
+            "chainable": 1,
+            "class": "DM",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 952,
+            "description": "Configuration getter/getter\n\nCurrently available configuration keys: attr, prefix\n\n- Getting the current value, call this with the only one string parameter:\n  _name_ of the configuration property\n- Set the single value `DM.config(string_name, string_value)`\n- Set any number of values `DM.config(Object.<key:value>)`",
+            "params": [
+                {
+                    "name": "cfg",
+                    "description": "",
+                    "type": "String|Object"
+                },
+                {
+                    "name": "value",
+                    "description": "",
+                    "type": "String?"
+                }
+            ],
+            "return": {
+                "description": "- current configuration value (`DM.config(string_value)",
+                "type": "String?"
+            },
+            "static": 1,
+            "itemtype": "method",
+            "name": "config",
+            "class": "DM",
+            "module": "dm"
+        },
+        {
+            "file": "dm.js",
+            "line": 992,
+            "description": "Revert inner configuration to default values",
+            "return": {
+                "description": "",
+                "type": "DM"
+            },
+            "static": 1,
+            "itemtype": "method",
+            "name": "resetConfig",
+            "chainable": 1,
+            "class": "DM",
+            "module": "dm"
+        }
+    ],
+    "warnings": [
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:26"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:37"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:50"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:98"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:108"
+        },
+        {
+            "message": "unknown tag: note",
+            "line": " dm.js:189"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:189"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:211"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:253"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:278"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:292"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:319"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:437"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:521"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:564"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:675"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:686"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:724"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:752"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:775"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:796"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:939"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:952"
+        },
+        {
+            "message": "replacing incorrect tag: returns with return",
+            "line": " dm.js:992"
+        },
+        {
+            "message": "Missing item type\nEach utility function",
+            "line": " dm.js:10"
+        },
+        {
+            "message": "Missing item type\nMap utility function",
+            "line": " dm.js:26"
+        },
+        {
+            "message": "Missing item type",
+            "line": " dm.js:37"
+        },
+        {
+            "message": "Missing item type\nTrim",
+            "line": " dm.js:50"
+        },
+        {
+            "message": "Missing item type",
+            "line": " dm.js:59"
+        },
+        {
+            "message": "Missing item type\nFilter utility function",
+            "line": " dm.js:98"
+        },
+        {
+            "message": "Missing item type\nFilter modules (exclude already executed on node)",
+            "line": " dm.js:108"
+        },
+        {
+            "message": "Missing item type\nInSort sorting implementation",
+            "line": " dm.js:189"
+        },
+        {
+            "message": "Missing item type\nReturn new unique id",
+            "line": " dm.js:211"
+        },
+        {
+            "message": "Missing item type\nCreate new {DMModule} instance",
+            "line": " dm.js:675"
+        },
+        {
+            "message": "Missing item type\nGet existing module or false",
+            "line": " dm.js:686"
+        }
+    ]
+}
