@@ -6,7 +6,7 @@ This will allows you do not use CSS selectors to find the DOM elements.
 
 ##Version
 
-Current version is: __*0.5.0*__ (in progress)
+Current version is: __*0.5.0*__
 
 [![Build Status](https://secure.travis-ci.org/dmjs/dm.js.png?branch=master)](http://travis-ci.org/dmjs/dm.js)
 
@@ -51,7 +51,7 @@ Checkout the [Demos][demos]
 
 ##API
 
-Checkout our [Wiki pages][wiki] to see full details
+Checkout our [Wiki pages][wiki] and [API docs][api] to see full details
 
 ##Generate Docs
 
@@ -76,7 +76,7 @@ $npm test
 
 ###Testing in *normal* browsers
 
-simply open `tests/unit/dm.html` in browser & check the output of the testing console
+simply open [`tests/unit/dm.html`][tests] in browser & check the output of the testing console
 
 ##Release History
 
@@ -91,9 +91,12 @@ The above copyright notice and this permission notice shall be included in all c
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 [demos]:http://dmjs.github.io/dm.js/demo/
+[api]:http://dmjs.github.io/dm.js/docs/out/classes/DM.html
+[tests]:http://dmjs.github.io/dm.js/tests/unit/dm.html
 [changelog]:https://github.com/dmjs/dm.js/wiki/Changelog
 [release]:https://github.com/dmjs/dm.js/zipball/master
 [bower]:http://bower.io/
 [github-grover]:https://github.com/yui/grover
 [github-yuidoc]:https://github.com/yui/yuidoc
 [wiki]:https://github.com/dmjs/dm.js/wiki
+
