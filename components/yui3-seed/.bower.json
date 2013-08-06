@@ -1,0 +1,15 @@
+{
+  "name": "yui3-seed",
+  "description": "YUI3 library seed file",
+  "version": "3.10.3",
+  "main": "yui-min.js",
+  "homepage": "https://github.com/jslayer/yui3-seed",
+  "_release": "3.10.3",
+  "_resolution": {
+    "type": "version",
+    "tag": "v3.10.3",
+    "commit": "4130f74f15483ef9656a0f4c3cb6bd6ab4fb594e"
+  },
+  "_source": "git://github.com/jslayer/yui3-seed.git",
+  "_target": "~3.10.3"
+}
