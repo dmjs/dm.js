@@ -756,7 +756,7 @@ var DM = (function(options){
          *
          * @param {String} name - name of the module
          * @param {Function} callback - the module preceding function
-         * @param {Number?} weight - the weight of the callback (lower have the bigger priority)
+         * @param {Number?} weight - the weight of the callback (lower have the higher priority)
          * @returns {Number} - UUID of the callback
          * @static
          * @method before
@@ -777,7 +777,7 @@ var DM = (function(options){
          *
          * @param {String} name - name of the module
          * @param {Function} callback - the module succeeding function
-         * @param {Number?} weight - the weight of the callback (lower have the bigger priority)
+         * @param {Number?} weight - the weight of the callback (lower have the higher priority)
          * @returns {Number} - UUID of the callback
          * @static
          * @method after
