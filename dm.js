@@ -241,7 +241,7 @@ function DMModule(name, callback, dependency){
     this._instances = [];
     this._add = callback;
 
-    DMUtils.each(dependency, function(name) {
+    DMUtils.each(dependency, function(name){
         this._dependency.push({
             name      : name,
             data      : null,
@@ -588,8 +588,8 @@ DMExec.prototype.dependency = function(name){
 
     dependencies = this.module._dependency;
 
-    for(i = 0, l = dependencies.length; i < l; i++) {
-        if (dependencies[i].name === name ) {
+    for (i = 0, l = dependencies.length; i < l; i++) {
+        if (dependencies[i].name === name) {
             result = dependencies[i];
             break;
         }
@@ -696,8 +696,8 @@ var DM = (function(options){
         return module instanceof DMModule ? module : false;
     }
 
-    function onFinish(dependancies, listener) {
-        DMUtils.each(dependancies, function(dep) {
+    function onFinish(dependencies, listener){
+        DMUtils.each(dependencies, function(dep){
             if (!_bind[dep.name]) {
                 _bind[dep.name] = {}
             }
@@ -705,8 +705,16 @@ var DM = (function(options){
         });
     }
 
-    function executeModule(module, cb) {
-        DMUtils.each(module._instances, function(inst) {
+    function executeModule(module, cb){
+        var i = 0, c = module._instances.length;
+
+        function finish(){
+            if (i >= c) {
+                cb.call(module);
+            }
+        }
+
+        DMUtils.each(module._instances, function(inst){
             if (DMUtils.updateNodeState(inst.node, module, _modules, 2)) {
                 //update dependencies
                 DMUtils.each(module._dependency, function(dep){
@@ -715,7 +723,9 @@ var DM = (function(options){
                     dep.data = mod.data;
                 });
 
-                new DMExec(module, inst, cb);
+                i++;
+
+                new DMExec(module, inst, finish);
             }
         });
     }
@@ -825,10 +835,10 @@ var DM = (function(options){
                 var executed = [];
 
                 var finishCallback = function(){
-                    executed.push(this.module.name);
+                    executed.push(this.name);
 
-                    if (_bind[this.module.name]) {
-                        DMUtils.each(_bind[this.module.name], function(module){
+                    if (_bind[this.name]) {
+                        DMUtils.each(_bind[this.name], function(module){
                             var ec = 0;
 
                             DMUtils.each(module._dependency, function(dep){
@@ -841,8 +851,8 @@ var DM = (function(options){
                                 executeModule(module, finishCallback);
                             }
 
-                            _bind[this.module.name] = null;
-                            delete _bind[this.module.name];
+                            _bind[this.name] = null;
+                            delete _bind[this.name];
                         }, this);
                     }
                 };
