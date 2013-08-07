@@ -616,7 +616,7 @@
                 },
                 {
                     "name": "weight",
-                    "description": "- the weight of the callback (lower have the bigger priority)",
+                    "description": "- the weight of the callback (lower have the higher priority)",
                     "type": "Number?"
                 }
             ],
@@ -650,7 +650,7 @@
                 },
                 {
                     "name": "weight",
-                    "description": "- the weight of the callback (lower have the bigger priority)",
+                    "description": "- the weight of the callback (lower have the higher priority)",
                     "type": "Number?"
                 }
             ],
