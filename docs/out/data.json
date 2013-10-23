@@ -2,7 +2,7 @@
     "project": {
         "name": "dm",
         "description": "Gives the simple website development workflow.",
-        "version": "0.5.0"
+        "version": "0.5.1"
     },
     "files": {
         "dm.js": {
@@ -567,7 +567,7 @@
         },
         {
             "file": "dm.js",
-            "line": 724,
+            "line": 734,
             "description": "Declare DM module",
             "params": [
                 {
@@ -601,7 +601,7 @@
         },
         {
             "file": "dm.js",
-            "line": 752,
+            "line": 762,
             "description": "Declare the callback preceding the module body function\n\nIf the module weren't created by `DM.add`: new module (without the body) will be created implicitly",
             "params": [
                 {
@@ -635,7 +635,7 @@
         },
         {
             "file": "dm.js",
-            "line": 775,
+            "line": 785,
             "description": "Declare the callback succeeding the module body function",
             "params": [
                 {
@@ -669,7 +669,7 @@
         },
         {
             "file": "dm.js",
-            "line": 796,
+            "line": 806,
             "description": "Initiate callbacks execution",
             "return": {
                 "description": "",
@@ -684,7 +684,7 @@
         },
         {
             "file": "dm.js",
-            "line": 862,
+            "line": 872,
             "description": "Detach the callback",
             "params": [
                 {
@@ -706,7 +706,7 @@
         },
         {
             "file": "dm.js",
-            "line": 923,
+            "line": 933,
             "description": "Remove module from registry",
             "params": [
                 {
@@ -728,7 +728,7 @@
         },
         {
             "file": "dm.js",
-            "line": 939,
+            "line": 949,
             "description": "Remove all modules from registry",
             "return": {
                 "description": "",
@@ -743,7 +743,7 @@
         },
         {
             "file": "dm.js",
-            "line": 952,
+            "line": 962,
             "description": "Configuration getter/getter\n\nCurrently available configuration keys: attr, prefix\n\n- Getting the current value, call this with the only one string parameter:\n  _name_ of the configuration property\n- Set the single value `DM.config(string_name, string_value)`\n- Set any number of values `DM.config(Object.<key:value>)`",
             "params": [
                 {
@@ -769,7 +769,7 @@
         },
         {
             "file": "dm.js",
-            "line": 992,
+            "line": 1002,
             "description": "Revert inner configuration to default values",
             "return": {
                 "description": "",
@@ -854,31 +854,31 @@
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " dm.js:724"
+            "line": " dm.js:734"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " dm.js:752"
+            "line": " dm.js:762"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " dm.js:775"
+            "line": " dm.js:785"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " dm.js:796"
+            "line": " dm.js:806"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " dm.js:939"
+            "line": " dm.js:949"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " dm.js:952"
+            "line": " dm.js:962"
         },
         {
             "message": "replacing incorrect tag: returns with return",
-            "line": " dm.js:992"
+            "line": " dm.js:1002"
         },
         {
             "message": "Missing item type\nEach utility function",
