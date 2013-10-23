@@ -157,7 +157,7 @@ var DMUtils = {
      * @return {Array.&lt;{name:String,args:Array}&gt;}
      */
     getModules : function(node, attrName){
-        return DMUtils.map(node.getAttribute(attrName).match(/([a-zA-Z][a-zA-Z\-0-9]*(\[[^[]+\])?)/ig) || [], function(str){
+        return DMUtils.map(node.getAttribute(attrName).match(/([a-zA-Z][a-zA-Z\-0-9_]*(\[[^[]+\])?)/ig) || [], function(str){
             var parts = str.match(/[^\[\]]+/ig),
                 name,
                 args;
@@ -905,7 +905,7 @@ var DM = (function(options){
          * @method go
          * @chainable
          */
-        go : function(){
+        go : function() {
             //todo - should accept &amp; execute only asked module(s): Array.&lt;string&gt;
             initEngine(function(){
                 var ATTR = DM.config(&#x27;attr&#x27;),
