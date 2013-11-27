@@ -141,10 +141,6 @@ var DMUtils = {
 
         data[uuid] = state || result;
 
-        /*if (module.name === 'B') {
-         debugger;
-         }*/
-
         return result !== state;
     },
 
@@ -539,6 +535,13 @@ DMExec.prototype.wait = function(timeout, stop){
 DMExec.prototype.children = function(){
     //todo - should accept role
     //todo - should cache
+    //todo - new arguments: dependencies, role, cache ?
+    //which means:
+    //dependencies:
+    // each child could have other processed module
+    // each module save it's id in node
+    // the object result[N].modules[{moduleName : {data, instances}}]
+
     var attrName,
         nodes,
         result = {};
