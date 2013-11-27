@@ -12,26 +12,34 @@
 </head>
 <body>
 <h2 data-marker="A">A</h2>
-<h2 data-marker="B">B</h2>
-<h2 data-marker="B">B</h2>
+<h2 data-marker="B[2]">B</h2>
+<h2 data-marker="B[3]">B</h2>
 <h2 data-marker="C">C</h2>
 
 <script src="../dm.js"></script>
 <script>
     DM.add('A', function() {
         console.log('A');
-        this.wait(100);
         this.node.style.color = 'red';
-        console.log(this.dependency('B'));
+
+        var dep_b = this.dependency('B');
+
+        console.log('module data: ', dep_b.data);
+        console.log('0 instance data: ', dep_b.instances[0].data);
+        console.log('1 instance data: ', dep_b.instances[1].data);
     }, ['B', 'C']);
 
     DM.add('B', function() {
         console.log('B');
-        this.wait(100);
+        this.wait(1000);
         this.node.style.color = 'blue';
-        console.log(this.module.global);
 
-        this.module.global.a = 1;
+        //save to module data
+        !this.module.data.count && (this.module.data.count = 0);
+        this.module.data.count++;
+
+        //save to instance data
+        this.data.next = this.node.nextElementSibling;
     });
 
     DM.add('C', function() {
