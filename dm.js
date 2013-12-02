@@ -515,56 +515,6 @@ DMExec.prototype.wait = function(timeout, stop){
 };
 
 /**
- * Return children elements data
- *
- * Structure:
- *
- *     Object {
- *         module_name : Array.<
- *             {
- *                 node : Element
- *                 args : Array
- *             }
- *         >,
- *         ...
- *     }
- *
- * @returns {Object}
- * @method children
- */
-DMExec.prototype.children = function(){
-    //todo - should accept role
-    //todo - should cache
-    //todo - new arguments: dependencies, role, cache ?
-    //which means:
-    //dependencies:
-    // each child could have other processed module
-    // each module save it's id in node
-    // the object result[N].modules[{moduleName : {data, instances}}]
-
-    var attrName,
-        nodes,
-        result = {};
-
-    attrName = DM.config('prefix') + this.module.name;
-    nodes = DMUtils.all('[' + attrName + ']', this.node);
-
-    DMUtils.each(Array.prototype.slice.call(nodes), function(node){
-        DMUtils.each(DMUtils.getModules(node, attrName), function(module){
-            if (!result[module.name]) {
-                result[module.name] = [];
-            }
-            result[module.name].push({
-                node : node,
-                args : module.args
-            });
-        });
-    }, this);
-
-    return result;
-};
-
-/**
  * Return dependency information
  *
  * Structure:
@@ -605,7 +555,7 @@ DMExec.prototype.dependency = function(name){
  *
  * @class DM
  */
-var DM = (function(options){
+var DM = (function(options, Exec){
     var _modules = {},
         _engine,
         _bind = {},
@@ -733,6 +683,73 @@ var DM = (function(options){
         });
     }
 
+    /**
+     * Return children elements data
+     *
+     * Structure:
+     *
+     *     Object {
+     *         module_name : Array.<
+     *             {
+     *                 node : Element
+     *                 args : Array,
+     *                 modules : { - other module data
+     *                      module_name : instance
+     *                      ...
+     *                 }
+     *             }
+     *         >,
+     *         ...
+     *     }
+     *
+     * @returns {Object}
+     * @method children
+     */
+    DMExec.prototype.children = function(){
+        //todo - should accept role
+        //todo - should cache
+        //todo - new arguments: dependencies, role, cache ?
+        //which means:
+        //dependencies:
+        // each child could have other processed module
+        // each module save it's id in node
+        // the object result[N].modules[{moduleName : {data, instances}}]
+
+        var attrName,
+            nodes,
+            result = {};
+
+        attrName = DM.config('prefix') + this.module.name;
+        nodes = DMUtils.all('[' + attrName + ']', this.node);
+
+        DMUtils.each(Array.prototype.slice.call(nodes), function(node){
+            DMUtils.each(DMUtils.getModules(node, attrName), function(mod_data){
+                var module = _modules[mod_data.name],
+                    inst = {}, i, l;
+
+                if (!result[mod_data.name]) {
+                    result[mod_data.name] = [];
+                }
+
+                if (module) {
+                    for (i = 0, l = module._instances.length; i < l; i++) {
+                        if (module._instances[i].node === node) {
+                            inst[module.name] = module._instances[i];
+                        }
+                    }
+                }
+
+                result[mod_data.name].push({
+                    node    : node,
+                    args    : mod_data.args,
+                    modules : inst
+                });
+            });
+        }, this);
+
+        return result;
+    };
+
     return {
         /**
          * Declare DM module
@@ -814,7 +831,7 @@ var DM = (function(options){
          * @method go
          * @chainable
          */
-        go : function() {
+        go : function(){
             //todo - should accept & execute only asked module(s): Array.<string>
             initEngine(function(){
                 var ATTR = DM.config('attr'),
@@ -1028,4 +1045,4 @@ var DM = (function(options){
         j : typeof jQuery === 'function' && jQuery,
         y : typeof YUI === 'function' && YUI
     }
-});
+}, DMExec);
