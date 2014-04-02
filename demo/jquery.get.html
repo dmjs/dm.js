@@ -22,30 +22,20 @@
 </head>
 <body>
 <div class="container">
-    <div class="well widget" data-marker="get[data.html]">...</div>
+    <div class="well widget" data-marker="custom-block[data.html]">...</div>
 </div>
 <script>
   (function($) {
     /**
      * Set node to loading state
      */
-    DM.before('get', function() {
-      $(this.node).addClass('loading');
-    });
+    DM.before('custom-block', function(url) {
+      var $node = $(this.node);
 
-    /**
-     * Remove loading state from the node
-     */
-    DM.after('get', function() {
-      $(this.node).removeClass('loading');
-    });
+      $node.addClass('loading');
 
-    /**
-     * Basic content loading code
-     */
-    DM.add('get', function(url) {
       var cb = $.proxy(function(html) {
-        $(this.node).html(html);
+        $node.html(html);
         this.next();
       }, this);
 
@@ -54,6 +44,22 @@
       setTimeout(function() {
         $.get(url, cb);
       }, 600);
+    });
+
+    /**
+     * Remove loading state from the node
+     */
+    DM.after('custom-block', function() {
+      $(this.node).removeClass('loading');
+    });
+
+    /**
+     * Basic content loading code
+     */
+    DM.add('custom-block', function() {
+      this.node.style.borderWidth = '2px';
+      this.node.style.borderColor = 'red';
+      this.node.style.borderStyle = 'solid';
     });
   })(jQuery);
 
