@@ -5,7 +5,8 @@
  */
 
 //TODO - outer dependencies support (addDep, removeDep, getDep)
-//TODO - implement registry retrieving (for debug)
+//TODO - implement registry retrieving (for debug); this should show whole modules tree, dependencies etc.
+//TODO - add basic add/remove event listeners support (for children, ot delegate support for parent);
 var DMUtils = {
     /**
      * Each utility function
@@ -161,16 +162,6 @@ var DMUtils = {
 
         return result;
     },
-
-    /*    isEmpty : function(object) {
-     var i;//todo - probably should use some other way here
-     for(i in object) {
-     if (object.hasOwnProperty(i)) {
-     return false;
-     }
-     }
-     return true;
-     },*/
 
     keysCount : function(object){
         var i;//todo - probably should use some other way here
@@ -701,7 +692,7 @@ var DM = (function(options, Exec){
      *         >,
      *         ...
      *     }
-     *
+     * @deprecated
      * @returns {Object}
      * @method children
      */
@@ -714,6 +705,11 @@ var DM = (function(options, Exec){
         // each child could have other processed module
         // each module save it's id in node
         // the object result[N].modules[{moduleName : {data, instances}}]
+        //todo - totally remake children method:
+        // - add Children & Child object;
+        // - add one, all methods (returns many or one child);
+        // - instances could have basic useful methods;
+        // - child instance should might to return data from other (dependent) modules;
 
         var attrName,
             nodes,
@@ -724,6 +720,7 @@ var DM = (function(options, Exec){
 
         DMUtils.each(Array.prototype.slice.call(nodes), function(node){
             DMUtils.each(DMUtils.getModules(node, attrName), function(mod_data){
+                //console.log(mod_data);
                 var module = _modules[mod_data.name],
                     inst = {}, i, l;
 
@@ -852,17 +849,17 @@ var DM = (function(options, Exec){
                     });
                 });
 
-                var executed = [];
+                var executed = {};
 
                 var finishCallback = function(){
-                    executed.push(this.name);
+                    executed[this.name] = true;
 
                     if (_bind[this.name]) {
                         DMUtils.each(_bind[this.name], function(module){
                             var ec = 0;
 
                             DMUtils.each(module._dependency, function(dep){
-                                if (~executed.indexOf(dep.name)) {
+                                if (executed[dep.name] === true) {
                                     ec++;
                                 }
                             });
