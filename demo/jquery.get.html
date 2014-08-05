@@ -45,7 +45,7 @@
      */
     DM.add('get', function(url) {
       var cb = $.proxy(function(html) {
-        $(this.node).html(html);
+        this.node.innerHTML = html;
         this.next();
       }, this);
 
