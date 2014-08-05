@@ -74,41 +74,29 @@ var DMUtils = {
             for (_i0 = 0, _l0 = attr_info.length; _i0 < _l0; _i0++) {
                 _parts = attr_info[_i0].match(/[^\[\]]+/ig);
                 _name = _parts.shift();
-                _index = -1;
 
-                if (only) {
-                    for (_i1 = 0, _l1 = only.length; _i1 < _l1; _i1++) {
-                        if (_name === only[_i1]) {
-                            _index = _i1;
-                            break;
-                        }
+                _args = _parts[0] ? DMUtils.map(_parts[0].split(','), DMUtils.trim) : [];
+
+                for (_i1 = 0, _l1 = _args.length; _i1 < _l1; _i1++) {
+                    //convert arguments to native types
+                    if (_args[_i1] === 'false') {
+                        _args[_i1] = !1;
+                    }
+                    else if (_args[_i1] === 'true') {
+                        _args[_i1] = !0;
+                    }
+                    else if (_args[_i1] == parseFloat(_args[_i1])) {
+                        _args[_i1] = parseFloat(_args[_i1]);
+                    }
+                    else if (_args[_i1] === 'null') {
+                        _args[_i1] = null;
                     }
                 }
 
-                if (!only || only.length === 0 || _index > -1) {
-                    _args = _parts[0] ? DMUtils.map(_parts[0].split(','), DMUtils.trim) : [];
-
-                    for (_i1 = 0, _l1 = _args.length; _i1 < _l1; _i1++) {
-                        //convert arguments to native types
-                        if (_args[_i1] === 'false') {
-                            _args[_i1] = !1;
-                        }
-                        else if (_args[_i1] === 'true') {
-                            _args[_i1] = !0;
-                        }
-                        else if (_args[_i1] == parseFloat(_args[_i1])) {
-                            _args[_i1] = parseFloat(_args[_i1]);
-                        }
-                        else if (_args[_i1] === 'null') {
-                            _args[_i1] = null;
-                        }
-                    }
-
-                    result.push({
-                        name : _name,
-                        args : _args
-                    });
-                }
+                result.push({
+                    name : _name,
+                    args : _args
+                });
             }
         }
 
@@ -872,6 +860,11 @@ var DM = (function(options, Exec){
                 }
             }
 
+            /** TODO:
+              * create global DMExec executing environment in order to
+              * build relationship between different execution contexts (different DMExec instances)
+              */
+
             initEngine(function(){
                 var ATTR = DM.config('attr'),
                     nodes = DMUtils.all('[' + ATTR + ']', options.env.document);
@@ -918,11 +911,26 @@ var DM = (function(options, Exec){
                 };
 
                 DMUtils.each(_modules, function(module){
-                    if (module._dependency.length === 0) {
-                        executeModule(module, finishCallback);
+                    //filter modules
+                    var _index, _i1, _l1;
+
+                    _index = -1;
+                    if (f_modules) {
+                        for (_i1 = 0, _l1 = f_modules.length; _i1 < _l1; _i1++) {
+                            if (module.name === f_modules[_i1]) {
+                                _index = _i1;
+                                break;
+                            }
+                        }
                     }
-                    else {
-                        onFinish(module._dependency, module);
+
+                    if (!f_modules || f_modules.length === 0 || _index > -1) {
+                        if (module._dependency.length === 0) {
+                            executeModule(module, finishCallback);
+                        }
+                        else {
+                            onFinish(module._dependency, module);
+                        }
                     }
                 });
             });

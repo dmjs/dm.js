@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "grover tests/unit/*.html",
-    "postinstall" : "node_modules/bower/bin/bower install"
+    "postinstall": "bower install"
   },
   "repository": {
     "type": "git",
@@ -24,11 +24,12 @@
     "url": "https://github.com/jslayer/dm.js/issues"
   },
   "devDependencies": {
-    "grunt": "~0.4.1",
-    "grunt-contrib-uglify": "~0.2.2",
-    "grover": "~0.1.14",
     "bower": "~1.3.8",
-    "yuidocjs": "~0.3.45",
-    "phantomjs": "~1.9.7-15"
+    "grover": "~0.1.14",
+    "grunt": "~0.4.5",
+    "grunt-cli": "~0.1.13",
+    "grunt-contrib-uglify": "~0.2.2",
+    "phantomjs": "~1.9.7-15",
+    "yuidocjs": "~0.3.45"
   }
 }
