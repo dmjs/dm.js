@@ -1,0 +1,47 @@
+<!doctype html>
+<html data-marker="before,after">
+<head>
+    <style type="text/css">
+        html.loading {
+            background: #fafaf0;
+        }
+
+        html.loading body {
+            opacity: 0;
+            transition: opacity 1s;
+        }
+
+        html.loaded body {
+            opacity : 1;
+        }
+    </style>
+    <script src="../dm.js"></script>
+    <script>
+        DM.add('before', function(){
+            this.node.classList.add('loading');
+        });
+
+        DM.add('after', function(){
+            this.node.classList.add('loaded');
+        }, ['size']);
+
+        DM.go('before');
+    </script>
+</head>
+<body>
+<h1 data-marker="color[green],size[50px]">Hello cruel world</h1>
+
+<script>
+    DM.add('color', function(value) {
+        this.node.style.color = value;
+        this.wait(500);
+    });
+
+    DM.add('size', function(value) {
+        this.node.style.fontSize = value;
+    }, ['color']);
+
+    DM.go();
+</script>
+</body>
+</html>

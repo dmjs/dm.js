@@ -63,37 +63,56 @@ var DMUtils = {
      * @param {string} attrName
      * @return {Array.<{name:String,args:Array}>}
      */
-    getModules : function(node, attrName){
-        return DMUtils.map(node.getAttribute(attrName).match(/([a-zA-Z][a-zA-Z\-0-9_]*(\[[^[]+\])?)/ig) || [], function(str){
-            var parts = str.match(/[^\[\]]+/ig),
-                name,
-                args;
+    getModules : function(node, attrName, only){
+        var result, attr_info,
+            _i0, _l0, _i1, _l1, _parts, _name, _index, _args;
 
-            name = parts.shift();
-            //todo - parse json hash
-            args = parts[0] ? DMUtils.map(parts[0].split(','), DMUtils.trim) : [];
+        result = [];
+        attr_info = node.getAttribute(attrName).match(/([a-zA-Z][a-zA-Z\-0-9_.]*(\[[^[]+\])?)/ig);
 
-            //convert arguments to native types
-            DMUtils.each(args, function(value, key, data){
-                if (value === 'false') {
-                    data[key] = !1;
-                }
-                else if (value === 'true') {
-                    data[key] = !0;
-                }
-                else if (value == parseFloat(value)) {
-                    data[key] = parseFloat(value);
-                }
-                else if (value === 'null') {
-                    data[key] = null;
-                }
-            });
+        if (attr_info) {
+            for (_i0 = 0, _l0 = attr_info.length; _i0 < _l0; _i0++) {
+                _parts = attr_info[_i0].match(/[^\[\]]+/ig);
+                _name = _parts.shift();
+                _index = -1;
 
-            return {
-                name : name,
-                args : args
-            };
-        });
+                if (only) {
+                    for (_i1 = 0, _l1 = only.length; _i1 < _l1; _i1++) {
+                        if (_name === only[_i1]) {
+                            _index = _i1;
+                            break;
+                        }
+                    }
+                }
+
+                if (!only || only.length === 0 || _index > -1) {
+                    _args = _parts[0] ? DMUtils.map(_parts[0].split(','), DMUtils.trim) : [];
+
+                    for (_i1 = 0, _l1 = _args.length; _i1 < _l1; _i1++) {
+                        //convert arguments to native types
+                        if (_args[_i1] === 'false') {
+                            _args[_i1] = !1;
+                        }
+                        else if (_args[_i1] === 'true') {
+                            _args[_i1] = !0;
+                        }
+                        else if (_args[_i1] == parseFloat(_args[_i1])) {
+                            _args[_i1] = parseFloat(_args[_i1]);
+                        }
+                        else if (_args[_i1] === 'null') {
+                            _args[_i1] = null;
+                        }
+                    }
+
+                    result.push({
+                        name : _name,
+                        args : _args
+                    });
+                }
+            }
+        }
+
+        return result;
     },
 
     /**
@@ -437,6 +456,11 @@ DMExec.prototype._execute = function(type){
         module = this.module,
         obj;
 
+    if (type === types.STOP) {
+        //stop execution
+        return this;
+    }
+
     if (!(type === types.NEXT && this._state === states.INITIAL)) {
         if (!module.ready) {
             module._prepare();
@@ -492,7 +516,8 @@ DMExec.prototype._execute = function(type){
  * Initiate execution timeout
  *
  * @param {number?} timeout - wait timeout in ms; `default: 5000`
- * @param {boolean?} stop - will abort execution if timeout reached & value is true; `default: false`
+ * @param {Boolean|Function?} stop - will abort execution if timeout reached
+ *                                   & value (if `stop` is function than `value` is its returned value) is true; `default: false`
  * @method wait
  */
 DMExec.prototype.wait = function(timeout, stop){
@@ -501,7 +526,9 @@ DMExec.prototype.wait = function(timeout, stop){
     this._waiting = true;
 
     this._timer = setTimeout(function(){
-        self[stop ? 'stop' : 'next']();
+        self[
+            (typeof stop === 'function' ? stop() : stop) ? 'stop' : 'next'
+            ]();
     }, timeout || 5000);
 };
 
@@ -720,7 +747,6 @@ var DM = (function(options, Exec){
 
         DMUtils.each(Array.prototype.slice.call(nodes), function(node){
             DMUtils.each(DMUtils.getModules(node, attrName), function(mod_data){
-                //console.log(mod_data);
                 var module = _modules[mod_data.name],
                     inst = {}, i, l;
 
@@ -823,22 +849,39 @@ var DM = (function(options, Exec){
         /**
          * Initiate callbacks execution
          *
+         * @param {String|Array.<String>?} a_mods - one or more name of modules to execute
+         * @param {Boolean} a_debug - flag to enable debug mode
          * @returns {DM}
          * @static
          * @method go
          * @chainable
          */
-        go : function(){
-            //todo - should accept & execute only asked module(s): Array.<string>
+        go : function(a_mods, a_debug){
+            //todo - cover a_mods
+            var f_modules;
+
+            f_modules = [];
+
+            if (a_mods) {
+                //todo - optimize
+                if (a_mods.constructor === String) {
+                    f_modules = [a_mods];
+                }
+                else if (a_mods.constructor === Array) {
+                    f_modules = a_mods;
+                }
+            }
+
             initEngine(function(){
                 var ATTR = DM.config('attr'),
                     nodes = DMUtils.all('[' + ATTR + ']', options.env.document);
 
                 DMUtils.each(Array.prototype.slice.call(nodes), function(node){
-                    var modules = DMUtils.getModules(node, ATTR);
+                    var modules = DMUtils.getModules(node, ATTR, f_modules);
 
                     DMUtils.each(modules, function(data){
                         var module = getModule(data.name);
+
                         if (module && DMUtils.updateNodeState(node, module, _modules)) {
                             module._instances.push({
                                 node : node,
