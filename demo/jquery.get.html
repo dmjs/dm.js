@@ -1,63 +1,69 @@
 <!doctype html>
 <html lang="en-US">
 <head>
-  <meta charset="UTF-8">
-  <title>DM example</title>
-  <script src="components/jquery/jquery.min.js"></script>
-  <script src="../dm.js"></script>
-  <link rel="stylesheet" href="components/bootstrap/docs/assets/css/bootstrap.css" />
-  <style type="text/css">
-    .widget {
-      margin : 10px 0;
-      min-height: 90px;
-      transition: opacity 0.5s ease;
-    }
-    .widget.loading {
-      opacity: 0.3;
-      text-align : center;
-      line-height : 70px;
-      font-size : 40px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>DM example</title>
+    <script src="components/jquery/jquery.min.js"></script>
+    <script src="../dm.js"></script>
+    <link rel="stylesheet" href="components/bootstrap/docs/assets/css/bootstrap.css" />
+    <style type="text/css">
+        .widget {
+            margin : 10px 0;
+            min-height: 90px;
+            transition: opacity 0.5s ease;
+        }
+        .widget.loading {
+            opacity: 0.3;
+            text-align : center;
+            line-height : 70px;
+            font-size : 40px;
+        }
+    </style>
 </head>
 <body>
 <div class="container">
-    <div class="well widget" data-marker="get[data.html]">...</div>
+    <div class="well widget" data-marker="custom-block[data.html]">...</div>
 </div>
 <script>
-  (function($) {
-    /**
-     * Set node to loading state
-     */
-    DM.before('get', function() {
-      $(this.node).addClass('loading');
-    });
+    (function($) {
+        /**
+         * Set node to loading state
+         */
+        DM.before('custom-block', function(url) {
+            var $node = $(this.node);
 
-    /**
-     * Remove loading state from the node
-     */
-    DM.after('get', function() {
-      $(this.node).removeClass('loading');
-    });
+            $node.addClass('loading');
 
-    /**
-     * Basic content loading code
-     */
-    DM.add('get', function(url) {
-      var cb = $.proxy(function(html) {
-        this.node.innerHTML = html;
-        this.next();
-      }, this);
+            var cb = $.proxy(function(html) {
+                $node.html(html);
+                this.next();
+            }, this);
 
-      this.wait(2000);
+            this.wait(2000);
 
-      setTimeout(function() {
-        $.get(url, cb);
-      }, 600);
-    });
-  })(jQuery);
+            setTimeout(function() {
+                $.get(url, cb);
+            }, 600);
+        });
 
-  DM.go();
+        /**
+         * Remove loading state from the node
+         */
+        DM.after('custom-block', function() {
+            $(this.node).removeClass('loading');
+        });
+
+        /**
+         * Basic content loading code
+         */
+        DM.add('custom-block', function() {
+            this.node.style.borderWidth = '2px';
+            this.node.style.borderColor = 'red';
+            this.node.style.borderStyle = 'solid';
+        });
+    })(jQuery);
+
+    DM.go();
 </script>
 </body>
 </html>
