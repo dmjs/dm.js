@@ -7,7 +7,8 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "grover tests/unit/*.html"
+    "test": "grover tests/unit/*.html",
+    "postinstall" : "node_modules/bower/bin/bower install"
   },
   "repository": {
     "type": "git",
