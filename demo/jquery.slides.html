@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>DM example</title>
+    <script src="components/jquery/jquery.min.js"></script>
+    <script src="../dm.min.js"></script>
+    <style type="text/css">
+        .pages-wrapper {
+        }
+
+        .block-wrapper {
+            padding: 0;
+            margin: 0 auto;
+            clear: both;
+            overflow: hidden;
+            list-style: none;
+            width: 900px;
+            background: #ccc;
+            display: none;
+        }
+
+        .block {
+            width: 300px;
+            height: 200px;
+            font-size: 150px;
+            line-height: 190px;
+            text-align: center;
+            float: left;
+            opacity: 0;
+            -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+            filter: alpha(opacity=0);
+        }
+
+        .block-red {
+            background: red;
+        }
+
+        .block-green {
+            background: green;
+        }
+
+        .block-blue {
+            background: blue;
+        }
+
+        .block-cyan {
+            background: cyan;
+        }
+
+        .block-yellow {
+            background: yellow;
+        }
+
+        .block-magenta {
+            background: magenta;
+        }
+
+        button {
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="pages-wrapper" data-marker="pages[800, 400, 900]">
+    <ul class="block-wrapper" data-pages="section[0]">
+        <li class="block block-red" data-pages="block[0,0]">A</li>
+        <li class="block block-green" data-pages="block[0,2]">B</li>
+        <li class="block block-blue" data-pages="block[0,1]">C</li>
+        <li class="block block-cyan" data-pages="block[0,3]">D</li>
+        <li class="block block-magenta" data-pages="block[0,5]">E</li>
+        <li class="block block-yellow" data-pages="block[0,4]">F</li>
+    </ul>
+    <ul class="block-wrapper" data-pages="section[1]">
+        <li class="block block-magenta" data-pages="block[1,0]">G</li>
+        <li class="block block-cyan" data-pages="block[1,1]">H</li>
+        <li class="block block-blue" data-pages="block[1,2]">I</li>
+        <li class="block block-green" data-pages="block[1,5]">J</li>
+        <li class="block block-yellow" data-pages="block[1,4]">K</li>
+        <li class="block block-red" data-pages="block[1,3]">L</li>
+    </ul>
+    <ul class="block-wrapper" data-pages="section[2]">
+        <li class="block block-magenta" data-pages="block[2,0]">M</li>
+        <li class="block block-cyan" data-pages="block[2,1]">N</li>
+        <li class="block block-blue" data-pages="block[2,2]">O</li>
+        <li class="block block-green" data-pages="block[2,5]">P</li>
+        <li class="block block-yellow" data-pages="block[2,4]">Q</li>
+        <li class="block block-red" data-pages="block[2,3]">R</li>
+    </ul>
+    <hr>
+    <button data-pages="button[prev]">prev</button>
+    <button data-pages="button[next]">next</button>
+</div>
+
+<script>
+    (function($){
+        DM.add('pages', function(speed_page, speed_block, delay_page){
+            var current_page = null, current_block = null,
+                children = this.children(),
+                pages = [],
+                is_initialized = false,
+                i, l, item;
+
+            //build 2-dim array of pages
+            if (children.section) {
+                for (i = 0, l = children.section.length; i < l; i++) {
+                    item = children.section[i];
+                    pages[item.args[0]] = {
+                        blocks : [],
+                        node   : item.node
+                    };
+                }
+
+                if (children.block) {
+                    for (i = 0, l = children.block.length; i < l; i++) {
+                        item = children.block[i];
+                        pages[item.args[0]].blocks[item.args[1]] = item.node;
+                    }
+                }
+
+                //bind buttons
+                if (children.button) {
+                    for (i = 0, l = children.button.length; i < l; i++) {
+                        item = children.button[i];
+
+                        $(item.node).click(item.args[0], function(e){
+                            switch (e.data) {
+                                case 'prev':
+                                    if (current_page > 0) {
+                                        switch_page(current_page - 1, true, false);
+                                    }
+                                    break;
+                                case 'next':
+                                    if (current_page <= pages.length - 2) {
+                                        switch_page(current_page + 1, true, false);
+                                    }
+                            }
+                        });
+                    }
+                }
+            }
+
+            switch_buttons_state(false);
+
+            switch_page(0, false, true);
+
+            /*****FUNCTIONS*****/
+
+            function switch_page(index, animate_page, animate_blocks){
+                if (current_page !== index) {
+                    is_initialized && switch_buttons_state(false);
+
+                    index = index || 0;
+                    animate_page = animate_page || false;
+                    animate_blocks = animate_blocks || false;
+
+                    if (current_page !== null) {
+                        $(pages[current_page].node).fadeOut(0, body);
+                    }
+                    else {
+                        body();
+                    }
+                }
+
+                function cb(){
+                    is_initialized && switch_buttons_state(true);
+
+                    if (animate_blocks) {
+                        block_animation();
+                    }
+                }
+
+                function body(){
+                    current_page = index;
+
+                    if (pages[index]) {
+                        if (animate_page) {
+                            $(pages[index].node).fadeIn(speed_page, cb);
+                        }
+                        else {
+                            $(pages[index].node).fadeIn(0, cb);
+                        }
+                    }
+                }
+            }
+
+            function switch_buttons_state(enable){
+                //bind buttons
+                if (children.button) {
+                    for (i = 0, l = children.button.length; i < l; i++) {
+                        item = children.button[i];
+                        if (!enable) {
+                            item.node.disabled = !enable;
+                        }
+                        else {
+                            switch (item.args[0]) {
+                                case 'prev':
+                                    item.node.disabled = !(current_page > 0);
+                                    break;
+                                case 'next':
+                                    item.node.disabled = !(current_page <= pages.length - 2);
+                                    break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            function block_animation(){
+                current_block = current_block === null ? 0 : current_block + 1;
+
+                if (pages[current_page] && pages[current_page].blocks[current_block]) {
+                    $(pages[current_page].blocks[current_block]).animate({
+                        opacity : 1
+                    }, speed_block, function(){
+                        block_animation();
+                    });
+                }
+                else {
+                    current_block = null;
+
+                    if (pages[current_page + 1]) {
+                        setTimeout(function(){
+                            switch_page(current_page + 1, true, true);
+                        }, delay_page);
+                    }
+                    else {
+                        switch_buttons_state(true);
+                        is_initialized = true;
+                    }
+                }
+            }
+        });
+
+        DM.go();
+    })(jQuery);
+</script>
+</body>
+</html>

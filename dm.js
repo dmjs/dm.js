@@ -5,7 +5,8 @@
  */
 
 //TODO - outer dependencies support (addDep, removeDep, getDep)
-//TODO - implement registry retrieving (for debug)
+//TODO - implement registry retrieving (for debug); this should show whole modules tree, dependencies etc.
+//TODO - add basic add/remove event listeners support (for children, ot delegate support for parent);
 var DMUtils = {
     /**
      * Each utility function
@@ -62,37 +63,44 @@ var DMUtils = {
      * @param {string} attrName
      * @return {Array.<{name:String,args:Array}>}
      */
-    getModules : function(node, attrName){
-        return DMUtils.map(node.getAttribute(attrName).match(/([a-zA-Z][a-zA-Z\-0-9_]*(\[[^[]+\])?)/ig) || [], function(str){
-            var parts = str.match(/[^\[\]]+/ig),
-                name,
-                args;
+    getModules : function(node, attrName, only){
+        var result, attr_info,
+            _i0, _l0, _i1, _l1, _parts, _name, _index, _args;
 
-            name = parts.shift();
-            //todo - parse json hash
-            args = parts[0] ? DMUtils.map(parts[0].split(','), DMUtils.trim) : [];
+        result = [];
+        attr_info = node.getAttribute(attrName).match(/([a-zA-Z][a-zA-Z\-0-9_.]*(\[[^[]+\])?)/ig);
 
-            //convert arguments to native types
-            DMUtils.each(args, function(value, key, data){
-                if (value === 'false') {
-                    data[key] = !1;
-                }
-                else if (value === 'true') {
-                    data[key] = !0;
-                }
-                else if (value == parseFloat(value)) {
-                    data[key] = parseFloat(value);
-                }
-                else if (value === 'null') {
-                    data[key] = null;
-                }
-            });
+        if (attr_info) {
+            for (_i0 = 0, _l0 = attr_info.length; _i0 < _l0; _i0++) {
+                _parts = attr_info[_i0].match(/[^\[\]]+/ig);
+                _name = _parts.shift();
 
-            return {
-                name : name,
-                args : args
-            };
-        });
+                _args = _parts[0] ? DMUtils.map(_parts[0].split(','), DMUtils.trim) : [];
+
+                for (_i1 = 0, _l1 = _args.length; _i1 < _l1; _i1++) {
+                    //convert arguments to native types
+                    if (_args[_i1] === 'false') {
+                        _args[_i1] = !1;
+                    }
+                    else if (_args[_i1] === 'true') {
+                        _args[_i1] = !0;
+                    }
+                    else if (_args[_i1] == parseFloat(_args[_i1])) {
+                        _args[_i1] = parseFloat(_args[_i1]);
+                    }
+                    else if (_args[_i1] === 'null') {
+                        _args[_i1] = null;
+                    }
+                }
+
+                result.push({
+                    name : _name,
+                    args : _args
+                });
+            }
+        }
+
+        return result;
     },
 
     /**
@@ -141,10 +149,6 @@ var DMUtils = {
 
         data[uuid] = state || result;
 
-        /*if (module.name === 'B') {
-         debugger;
-         }*/
-
         return result !== state;
     },
 
@@ -165,16 +169,6 @@ var DMUtils = {
 
         return result;
     },
-
-    /*    isEmpty : function(object) {
-     var i;//todo - probably should use some other way here
-     for(i in object) {
-     if (object.hasOwnProperty(i)) {
-     return false;
-     }
-     }
-     return true;
-     },*/
 
     keysCount : function(object){
         var i;//todo - probably should use some other way here
@@ -450,6 +444,11 @@ DMExec.prototype._execute = function(type){
         module = this.module,
         obj;
 
+    if (type === types.STOP) {
+        //stop execution
+        return this;
+    }
+
     if (!(type === types.NEXT && this._state === states.INITIAL)) {
         if (!module.ready) {
             module._prepare();
@@ -505,7 +504,8 @@ DMExec.prototype._execute = function(type){
  * Initiate execution timeout
  *
  * @param {number?} timeout - wait timeout in ms; `default: 5000`
- * @param {boolean?} stop - will abort execution if timeout reached & value is true; `default: false`
+ * @param {Boolean|Function?} stop - will abort execution if timeout reached
+ *                                   & value (if `stop` is function than `value` is its returned value) is true; `default: false`
  * @method wait
  */
 DMExec.prototype.wait = function(timeout, stop){
@@ -514,51 +514,10 @@ DMExec.prototype.wait = function(timeout, stop){
     this._waiting = true;
 
     this._timer = setTimeout(function(){
-        self[stop ? 'stop' : 'next']();
+        self[
+            (typeof stop === 'function' ? stop() : stop) ? 'stop' : 'next'
+            ]();
     }, timeout || 5000);
-};
-
-/**
- * Return children elements data
- *
- * Structure:
- *
- *     Object {
- *         module_name : Array.<
- *             {
- *                 node : Element
- *                 args : Array
- *             }
- *         >,
- *         ...
- *     }
- *
- * @returns {Object}
- * @method children
- */
-DMExec.prototype.children = function(){
-    //todo - should accept role
-    //todo - should cache
-    var attrName,
-        nodes,
-        result = {};
-
-    attrName = DM.config('prefix') + this.module.name;
-    nodes = DMUtils.all('[' + attrName + ']', this.node);
-
-    DMUtils.each(Array.prototype.slice.call(nodes), function(node){
-        DMUtils.each(DMUtils.getModules(node, attrName), function(module){
-            if (!result[module.name]) {
-                result[module.name] = [];
-            }
-            result[module.name].push({
-                node : node,
-                args : module.args
-            });
-        });
-    }, this);
-
-    return result;
 };
 
 /**
@@ -602,7 +561,7 @@ DMExec.prototype.dependency = function(name){
  *
  * @class DM
  */
-var DM = (function(options){
+var DM = (function(options, Exec){
     var _modules = {},
         _engine,
         _bind = {},
@@ -730,6 +689,78 @@ var DM = (function(options){
         });
     }
 
+    /**
+     * Return children elements data
+     *
+     * Structure:
+     *
+     *     Object {
+     *         module_name : Array.<
+     *             {
+     *                 node : Element
+     *                 args : Array,
+     *                 modules : { - other module data
+     *                      module_name : instance
+     *                      ...
+     *                 }
+     *             }
+     *         >,
+     *         ...
+     *     }
+     * @deprecated
+     * @returns {Object}
+     * @method children
+     */
+    DMExec.prototype.children = function(){
+        //todo - should accept role
+        //todo - should cache
+        //todo - new arguments: dependencies, role, cache ?
+        //which means:
+        //dependencies:
+        // each child could have other processed module
+        // each module save it's id in node
+        // the object result[N].modules[{moduleName : {data, instances}}]
+        //todo - totally remake children method:
+        // - add Children & Child object;
+        // - add one, all methods (returns many or one child);
+        // - instances could have basic useful methods;
+        // - child instance should might to return data from other (dependent) modules;
+
+        var attrName,
+            nodes,
+            result = {};
+
+        attrName = DM.config('prefix') + this.module.name;
+        nodes = DMUtils.all('[' + attrName + ']', this.node);
+
+        DMUtils.each(Array.prototype.slice.call(nodes), function(node){
+            DMUtils.each(DMUtils.getModules(node, attrName), function(mod_data){
+                var module = _modules[mod_data.name],
+                    inst = {}, i, l;
+
+                if (!result[mod_data.name]) {
+                    result[mod_data.name] = [];
+                }
+
+                if (module) {
+                    for (i = 0, l = module._instances.length; i < l; i++) {
+                        if (module._instances[i].node === node) {
+                            inst[module.name] = module._instances[i];
+                        }
+                    }
+                }
+
+                result[mod_data.name].push({
+                    node    : node,
+                    args    : mod_data.args,
+                    modules : inst
+                });
+            });
+        }, this);
+
+        return result;
+    };
+
     return {
         /**
          * Declare DM module
@@ -806,22 +837,44 @@ var DM = (function(options){
         /**
          * Initiate callbacks execution
          *
+         * @param {String|Array.<String>?} a_mods - one or more name of modules to execute
+         * @param {Boolean} a_debug - flag to enable debug mode
          * @returns {DM}
          * @static
          * @method go
          * @chainable
          */
-        go : function() {
-            //todo - should accept & execute only asked module(s): Array.<string>
+        go : function(a_mods, a_debug){
+            //todo - cover a_mods
+            var f_modules;
+
+            f_modules = [];
+
+            if (a_mods) {
+                //todo - optimize
+                if (a_mods.constructor === String) {
+                    f_modules = [a_mods];
+                }
+                else if (a_mods.constructor === Array) {
+                    f_modules = a_mods;
+                }
+            }
+
+            /** TODO:
+              * create global DMExec executing environment in order to
+              * build relationship between different execution contexts (different DMExec instances)
+              */
+
             initEngine(function(){
                 var ATTR = DM.config('attr'),
                     nodes = DMUtils.all('[' + ATTR + ']', options.env.document);
 
                 DMUtils.each(Array.prototype.slice.call(nodes), function(node){
-                    var modules = DMUtils.getModules(node, ATTR);
+                    var modules = DMUtils.getModules(node, ATTR, f_modules);
 
                     DMUtils.each(modules, function(data){
                         var module = getModule(data.name);
+
                         if (module && DMUtils.updateNodeState(node, module, _modules)) {
                             module._instances.push({
                                 node : node,
@@ -832,17 +885,17 @@ var DM = (function(options){
                     });
                 });
 
-                var executed = [];
+                var executed = {};
 
                 var finishCallback = function(){
-                    executed.push(this.name);
+                    executed[this.name] = true;
 
                     if (_bind[this.name]) {
                         DMUtils.each(_bind[this.name], function(module){
                             var ec = 0;
 
                             DMUtils.each(module._dependency, function(dep){
-                                if (~executed.indexOf(dep.name)) {
+                                if (executed[dep.name] === true) {
                                     ec++;
                                 }
                             });
@@ -858,11 +911,26 @@ var DM = (function(options){
                 };
 
                 DMUtils.each(_modules, function(module){
-                    if (module._dependency.length === 0) {
-                        executeModule(module, finishCallback);
+                    //filter modules
+                    var _index, _i1, _l1;
+
+                    _index = -1;
+                    if (f_modules) {
+                        for (_i1 = 0, _l1 = f_modules.length; _i1 < _l1; _i1++) {
+                            if (module.name === f_modules[_i1]) {
+                                _index = _i1;
+                                break;
+                            }
+                        }
                     }
-                    else {
-                        onFinish(module._dependency, module);
+
+                    if (!f_modules || f_modules.length === 0 || _index > -1) {
+                        if (module._dependency.length === 0) {
+                            executeModule(module, finishCallback);
+                        }
+                        else {
+                            onFinish(module._dependency, module);
+                        }
                     }
                 });
             });
@@ -1025,4 +1093,4 @@ var DM = (function(options){
         j : typeof jQuery === 'function' && jQuery,
         y : typeof YUI === 'function' && YUI
     }
-});
+}, DMExec);

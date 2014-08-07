@@ -11,33 +11,38 @@
     </style>
 </head>
 <body>
-<h2 data-marker="A">A</h2>
-<h2 data-marker="B">B</h2>
-<h2 data-marker="B">B</h2>
-<h2 data-marker="C">C</h2>
+<div data-marker="pages">
+    <div data-pages="page" data-marker="page">
+        <div data-page="section">A</div>
+        <div data-page="section" data-marker="section">
+            <button data-section="button[2]">BUTTON 2</button>
+        </div>
+        <div data-page="section" data-marker="section">
+            <button data-section="button[1]">BUTTON 1</button>
+        </div>
+    </div>
+    <div data-pages="page" data-marker="page">
+        <div data-page="section" data-marker="section">
+            <button data-section="button[2]">BUTTON 2</button>
+        </div>
+        <div data-page="section">C</div>
+        <div data-page="section">D</div>
+    </div>
+</div>
 
 <script src="../dm.js"></script>
 <script>
-    DM.add('A', function() {
-        console.log('A');
-        this.wait(100);
-        this.node.style.color = 'red';
-        console.log(this.dependency('B'));
-    }, ['B', 'C']);
+    DM.add('pages', function(){
+        console.log(this.dependency('page'));
+    }, ['page']);
 
-    DM.add('B', function() {
-        console.log('B');
-        this.wait(100);
-        this.node.style.color = 'blue';
-        console.log(this.module.global);
+    DM.add('page', function(){
+        this.data.sections = this.children().section;
+    }, ['section']);
 
-        this.module.data.a = 1;
-    });
-
-    DM.add('C', function() {
-        console.log('C');
-        this.wait(500);
-        this.node.style.color = 'green';
+    DM.add('section', function(){
+        //console.log(this);
+        this.data.buttons = this.children().button;
     });
 
     DM.go();

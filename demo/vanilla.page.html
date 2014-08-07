@@ -1,0 +1,44 @@
+<!doctype html>
+<html data-marker="app.before,app">
+<head>
+    <style type="text/css">
+        body {
+            opacity: 1;
+            transition: opacity 1s;
+        }
+
+        .loading body {
+            transition: opacity 0s;
+            opacity: 0;
+        }
+    </style>
+    <script src="../dm.js"></script>
+    <script>
+        DM.add('app.before', function(){
+            this.node.classList.add('loading');
+        });
+
+        DM.go('app.before');
+    </script>
+</head>
+<body>
+<h1 data-marker="color[green],size[50px]">Hello cruel world</h1>
+
+<script>
+    DM.add('color', function(value) {
+        this.node.style.color = value;
+        this.wait(500);
+    });
+
+    DM.add('size', function(value) {
+        this.node.style.fontSize = value;
+    }, ['color']);
+
+    DM.add('app', function(){
+        this.node.classList.remove('loading');
+    }, ['color', 'size']);
+
+    DM.go();
+</script>
+</body>
+</html>
