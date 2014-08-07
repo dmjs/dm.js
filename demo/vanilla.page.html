@@ -1,31 +1,24 @@
 <!doctype html>
-<html data-marker="before,after">
+<html data-marker="app.before,app">
 <head>
     <style type="text/css">
-        html.loading {
-            background: #fafaf0;
-        }
-
-        html.loading body {
-            opacity: 0;
+        body {
+            opacity: 1;
             transition: opacity 1s;
         }
 
-        html.loaded body {
-            opacity : 1;
+        .loading body {
+            transition: opacity 0s;
+            opacity: 0;
         }
     </style>
     <script src="../dm.js"></script>
     <script>
-        DM.add('before', function(){
+        DM.add('app.before', function(){
             this.node.classList.add('loading');
         });
 
-        DM.add('after', function(){
-            this.node.classList.add('loaded');
-        }, ['size']);
-
-        DM.go('before');
+        DM.go('app.before');
     </script>
 </head>
 <body>
@@ -40,6 +33,10 @@
     DM.add('size', function(value) {
         this.node.style.fontSize = value;
     }, ['color']);
+
+    DM.add('app', function(){
+        this.node.classList.remove('loading');
+    }, ['color', 'size']);
 
     DM.go();
 </script>
